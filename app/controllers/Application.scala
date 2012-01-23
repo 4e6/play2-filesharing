@@ -7,15 +7,13 @@ import play.api.templates.HtmlFormat
 import org.fusesource.scalate._
 
 object Application extends Controller {
-  lazy val engine = new TemplateEngine
+  lazy val engine = {
+    val e = new TemplateEngine
+    e.boot
+    e
+  }
 
   def index = Action {
-    //Ok(views.html.index())
-    val bindings = Map(
-      "title" -> "Index",
-      "content" -> "empty"
-    )
-    engine.boot
-    Ok(HtmlFormat raw engine.layout("index.jade", bindings))
+    Ok(HtmlFormat raw engine.layout("index.jade"))
   }
 }

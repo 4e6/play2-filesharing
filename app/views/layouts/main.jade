@@ -1,0 +1,11 @@
+-@ val body: String
+-@ val title: String = "Default Title"
+!!! 5
+html(lang="en")
+	head
+		title= title
+		meta(charset="utf-8")
+	body
+		div.header This is the header
+		div.contentBody 
+			!= body

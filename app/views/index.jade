@@ -1,9 +1,4 @@
--@ val title: String
--@ val content: String
-
-!!! 5
-html
-  head
-    title= title
-  body
-    = content
+-@ val result: String = "dropped"
+- attributes("title") = "Index title"
+- layout("layouts/main.jade")
+  div#query Your query was #{result}
