@@ -14,6 +14,11 @@ object Application extends Controller {
   }
 
   def index = Action {
-    Ok(HtmlFormat raw engine.layout("index.jade"))
+    Ok(HtmlFormat raw engine.layout("views/index.jade"))
+  }
+
+  def uploadFile = Action(parse.temporaryFile) { request =>
+    val f = request.body.file.getAbsolutePath
+    Ok("File saved as " + f)
   }
 }

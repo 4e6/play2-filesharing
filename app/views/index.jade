@@ -1,4 +1,6 @@
--@ val result: String = "dropped"
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
-  div#query Your query was #{result}
+  p Upload file
+  form(action={routes.Application.uploadFile.url} method="post")
+    input(type="file")
+    button(type="submit") Upload
