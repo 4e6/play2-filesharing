@@ -18,7 +18,8 @@ object ApplicationBuild extends Build {
     Resolver.file("Local Play20 Repository", file("/opt/git-repos/play20/repository/local"))(Resolver.ivyStylePatterns))
 
   val appSettings = Seq(
-    resolvers ++= appResolvers
+    resolvers ++= appResolvers,
+    javaOptions in run += "-Xmx2048M"
   )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA)
