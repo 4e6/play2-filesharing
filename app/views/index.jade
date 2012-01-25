@@ -1,6 +1,6 @@
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
   p Upload file
-  form(action={routes.Application.uploadFile.url} method="post")
+  form(action={routes.Application.uploadFile.url} method="post" enctype="multipart/form-data")
     input(type="file")
     button(type="submit") Upload

@@ -20,11 +20,11 @@ object Application extends Controller {
     Ok(HtmlFormat raw engine.layout("views/index.jade"))
   }
 
-  def uploadFile = Action(parse.temporaryFile) { request =>
-    val f = request.body.file.getAbsolutePath
-    transaction {
-      files.insert(new File(f))
-    }
-    Ok("File saved as " + f)
+  def uploadFile = Action(parse.multipartFormData) { request =>
+    val rawFile = request.body.files
+    //transaction {
+    //files.insert(new File(f))
+    //}
+    Ok("File saved as ")
   }
 }
