@@ -1,5 +1,8 @@
 logs
 project/project
 target
+*.db
+
 .history
 .ensime
+*.swp

@@ -5,6 +5,9 @@ import play.api.mvc._
 import play.api.templates.HtmlFormat
 
 import org.fusesource.scalate._
+import org.squeryl.PrimitiveTypeMode._
+import models.File
+import models.Files._
 
 object Application extends Controller {
   lazy val engine = {
@@ -19,6 +22,9 @@ object Application extends Controller {
 
   def uploadFile = Action(parse.temporaryFile) { request =>
     val f = request.body.file.getAbsolutePath
+    transaction {
+      files.insert(new File(f))
+    }
     Ok("File saved as " + f)
   }
 }
