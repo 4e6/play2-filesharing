@@ -2,5 +2,10 @@
 - layout("layouts/main.jade")
   p Upload file
   form(action={routes.Application.uploadFile.url} method="post" enctype="multipart/form-data")
-    input(type="file")
+    p
+      | Select file
+      input(type="file" name="file")
+    p
+      | Password
+      input(type="text" name="password")
     button(type="submit") Upload
