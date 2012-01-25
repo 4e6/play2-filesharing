@@ -1,6 +1,8 @@
 import sbt._
 import Keys._
 import PlayProject._
+import org.ensime.sbt.Plugin.Settings.ensimeConfig
+import org.ensime.sbt.util.SExp._
 
 object ApplicationBuild extends Build {
   val appName = "Web Clipboard"
@@ -19,9 +21,13 @@ object ApplicationBuild extends Build {
 
   val appSettings = Seq(
     resolvers ++= appResolvers,
-    javaOptions in run += "-Xmx2048M"
+    javaOptions in run += "-Xmx2048M",
+    ensimeConfig := sexp(
+      key(":formatting-prefs"), sexp(
+        key(":preserveDanglingCloseParenthesis"), true)
+    )
   )
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA)
-  .settings(appSettings: _*)
+    .settings(appSettings: _*)
 }
