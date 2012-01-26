@@ -18,44 +18,38 @@ import models.Files._
 trait Upload {
   self: Controller =>
 
-  def uploadFile = Action(parse.multipartFormData) { request =>
+  def uploadFile = Action(parse.multipartFormData) { implicit request =>
     Logger.debug("Start file uploading...")
     Logger.debug("body[" + request.body + "]")
 
-    lazy val timeNow = System.currentTimeMillis
-    lazy val timeToStore = timeNow + 60 * 60 * 1000
+    lazy val now = System.currentTimeMillis
+    lazy val to = now + 60 * 60 * 1000
 
-    val password = request.body.dataParts.get("password")
-      .flatMap { _.headOption }
-      .map { hash(timeNow.toString.getBytes) }
+    val password = getParam("password") map { hash(now) }
+    //val password: Validation[NonEmptyList[String], Array[Byte]] = "password".fail.liftFailNel
 
-    val uploadedFile = request.body.files.headOption map { filepart =>
-      val FilePart(_, filename, _, ref) = filepart
-      (filename, ref.file)
+    val url = getParam("url")
+    //val url: Validation[NonEmptyList[String], String] = "url".fail.liftFailNel
+
+    val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
+
+    val file = (filepart |@| password |@| url) { (fp, p, u) =>
+      val FilePart(_, name, _, ref) = fp
+      val ba = Resource.fromFile(ref.file).byteArray
+      new File(u, name, ba, new Timestamp(now), new Timestamp(to), Some(p), None, None)
     }
 
-    uploadedFile.cata(f => success("", f, timeNow, timeToStore, password, None, None), failure)
+    file.fold(failure, success)
   }
 
-  def success(url: String,
-              nameFile: (String, java.io.File),
-              from: Long,
-              to: Long,
-              pass: Option[Array[Byte]],
-              q: Option[String],
-              a: Option[Array[Byte]]) = {
-    val (name, file) = nameFile
-    transaction {
-      files insert new File(
-        url,
-        name,
-        Resource.fromFile(file).byteArray,
-        new Timestamp(from),
-        new Timestamp(to),
-        pass, q, a)
-    }
-    Ok("File saved as " + name)
-  }
+  def getParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
+    request.body.dataParts.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
 
-  def failure = Ok("File upload failed")
+  def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+
+  def success(f: File) = {
+    transaction(files insert f)
+    Ok("Success(" + f.name + ")")
+  }
 }
+
