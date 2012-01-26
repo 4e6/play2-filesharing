@@ -1,5 +1,8 @@
 # Routes
 
-#Home page
-GET   /                 controllers.Application.index()
-POST  /                 controllers.Application.uploadFile()
+# Home page
+GET      /              controllers.Application.index()
+POST     /              controllers.Application.uploadFile()
+
+# Downloading
+GET      /*url              controllers.Application.downloadFile(url)

@@ -14,7 +14,8 @@ import Helpers._
 import models.File
 import models.Files._
 
-object Application extends Controller {
+object Application extends Controller
+  with Download {
   lazy val engine = {
     val e = new TemplateEngine
     e.boot
