@@ -11,7 +11,8 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     "org.fusesource.scalate" % "scalate-core" % "1.5.3",
-    "org.squeryl" %% "squeryl" % "0.9.5-RC1"
+    "org.squeryl" %% "squeryl" % "0.9.5-RC1",
+    "org.scalaz" %% "scalaz-core" % "6.0.4"
   )
 
   val appResolvers = Seq(
