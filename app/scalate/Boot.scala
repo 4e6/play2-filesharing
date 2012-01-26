@@ -12,6 +12,6 @@ class Boot(engine: TemplateEngine) {
     engine.workingDirectory = new File(path, "/target/scala-2.9.1")
     engine.sourceDirectories = Seq(new File(path, "/app"))
     engine.layoutStrategy = new DefaultLayoutStrategy(engine)
-    Logger("play").info("Scalate configured")
+    Logger.info("Scalate configured")
   }
 }
