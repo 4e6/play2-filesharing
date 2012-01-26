@@ -26,7 +26,8 @@ object ApplicationBuild extends Build {
     ensimeConfig := sexp(
       key(":formatting-prefs"), sexp(
         key(":preserveDanglingCloseParenthesis"), true,
-        key(":alignParameters"), true
+        key(":alignParameters"), true,
+        key(":doubleIndentClassDeclaration"), true
       )
     )
   )

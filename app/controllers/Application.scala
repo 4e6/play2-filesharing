@@ -7,7 +7,7 @@ import play.api.templates.HtmlFormat
 import org.fusesource.scalate._
 
 object Application extends Controller
-  with Upload with Download {
+    with Upload with Download {
   lazy val engine = {
     val e = new TemplateEngine
     e.boot
