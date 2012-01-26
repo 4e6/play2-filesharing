@@ -9,9 +9,9 @@ class File(val url: String,
            val file: Array[Byte],
            val creationTime: Timestamp,
            val deletionTime: Timestamp,
-           val password: Option[String],
+           val password: Option[Array[Byte]],
            val question: Option[String],
-           val answer: Option[String]) {
+           val answer: Option[Array[Byte]]) {
   def this() =
     this(
       "url",
@@ -19,21 +19,24 @@ class File(val url: String,
       Array(),
       new Timestamp(System.currentTimeMillis),
       new Timestamp(System.currentTimeMillis),
-      Some("password"),
+      Some(Array()),
       Some("question"),
-      Some("answer")
+      Some(Array())
     )
 }
 
 object Files extends Schema {
+  val bytesPerFile = 25 * 1024 * 1024
+
   val files = table[File]("FILES")
 
   on(files) { f =>
     declare(
       f.url is (unique, indexed, dbType("varchar(255)")),
       f.name is (dbType("varchar(255)")),
+      f.file is (dbType("binary(" + bytesPerFile + ")")),
       f.question is (dbType("varchar(255)")),
-      f.password is (dbType("varchar(32)")),
-      f.answer is (dbType("varchar(32)")))
+      f.password is (dbType("binary(32)")),
+      f.answer is (dbType("binary(32)")))
   }
 }

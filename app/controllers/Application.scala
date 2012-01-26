@@ -10,6 +10,7 @@ import org.squeryl.PrimitiveTypeMode._
 import scalax.io.Resource
 import java.sql.Timestamp
 
+import Helpers._
 import models.File
 import models.Files._
 
@@ -28,7 +29,12 @@ object Application extends Controller {
     Logger.debug("Start file uploading...")
     Logger.debug("body[" + request.body + "]")
 
-    val password = request.body.dataParts.get("password") flatMap { _.headOption }
+    lazy val timeNow = System.currentTimeMillis
+    lazy val timeToStore = timeNow + 60 * 60 * 1000
+
+    val password = request.body.dataParts.get("password")
+      .flatMap { _.headOption }
+      .map { hash(timeNow.toString.getBytes) }
 
     val uploadedFile = request.body.files.headOption map { filepart =>
       val FilePart(_, filename, _, ref) = filepart
@@ -44,14 +50,14 @@ object Application extends Controller {
             url,
             filename,
             Resource.fromFile(file).byteArray,
-            new Timestamp(System.currentTimeMillis),
-            new Timestamp(System.currentTimeMillis + 60 * 60 * 1000),
+            new Timestamp(timeNow),
+            new Timestamp(timeToStore),
             password,
             None,
             None)
         }
       }
-      Ok("File saved as " + uploadedFile.get._1)
+      Ok("File saved as " + filename)
     } else
       Ok("File upload failed")
   }
