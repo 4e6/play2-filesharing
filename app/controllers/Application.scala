@@ -25,8 +25,8 @@ object Application extends Controller {
   }
 
   def uploadFile = Action(parse.multipartFormData) { request =>
-    Logger.info("Start file uploading...")
-    Logger.info("body[" + request.body + "]")
+    Logger.debug("Start file uploading...")
+    Logger.debug("body[" + request.body + "]")
 
     val password = request.body.dataParts.get("password") flatMap { _.headOption }
 
@@ -40,14 +40,15 @@ object Application extends Controller {
       val url = "http://localhost/" + filename
       transaction {
         files insert {
-          new File(url,
-                   filename,
-                   Resource.fromFile(file).byteArray,
-                   new Timestamp(System.currentTimeMillis),
-                   new Timestamp(System.currentTimeMillis + 60*60*1000),
-                   password,
-                   None,
-                   None)
+          new File(
+            url,
+            filename,
+            Resource.fromFile(file).byteArray,
+            new Timestamp(System.currentTimeMillis),
+            new Timestamp(System.currentTimeMillis + 60 * 60 * 1000),
+            password,
+            None,
+            None)
         }
       }
       Ok("File saved as " + uploadedFile.get._1)

@@ -24,7 +24,9 @@ object ApplicationBuild extends Build {
     javaOptions in run += "-Xmx2048M",
     ensimeConfig := sexp(
       key(":formatting-prefs"), sexp(
-        key(":preserveDanglingCloseParenthesis"), true)
+        key(":preserveDanglingCloseParenthesis"), true,
+        key(":alignParameters"), true
+      )
     )
   )
 

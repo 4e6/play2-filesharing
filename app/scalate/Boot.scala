@@ -7,7 +7,7 @@ import java.io.File
 
 class Boot(engine: TemplateEngine) {
   lazy val path = Play.current.path
-  
+
   def run() {
     engine.workingDirectory = new File(path, "/target/scala-2.9.1")
     engine.sourceDirectories = Seq(new File(path, "/app"))
