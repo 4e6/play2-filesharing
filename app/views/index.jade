@@ -1,16 +1,19 @@
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
-  p Upload file
   form(action={routes.Application.uploadFile.url} method="post" enctype="multipart/form-data")
-    p
-      | Select file
-      input(type="file" name="file")
-    p
-      | Desired URL:
-      br/
-      | http://localhost/
-      input(type="text" name="url")
-    p
-      | Password
-      input(type="text" name="password")
-    button(type="submit") Upload
+    fieldset
+      legend Upload file
+      div
+        label(for="filename") Select file
+        input#filename(type="file" name="file")
+        span#validateUsername
+      div
+        label(for="url") Desired URL:
+        span http://localhost/
+        input#url(type="text" name="url")
+        span#validateUrl
+      div
+        label(for="password") Password
+        input#password(type="text" name="password")
+      #submit
+        button#upload(type="submit" name="upload") Upload
