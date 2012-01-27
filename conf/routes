@@ -1,8 +1,11 @@
 # Routes
 
 # Home page
-GET      /              controllers.Application.index()
-POST     /              controllers.Application.uploadFile()
+GET      /                      controllers.Application.index()
+POST     /                      controllers.Application.uploadFile()
+
+# Static resources
+GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
 # Downloading
-GET      /*url              controllers.Application.downloadFile(url)
+GET      /*url                  controllers.Application.downloadFile(url)
