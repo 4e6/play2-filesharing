@@ -1,0 +1,19 @@
+-@ val url: String
+-@ val filename: String
+-@ val password: Boolean = false
+-@ val question: Boolean = false
+- attributes("title") = "Download file"
+- layout("layouts/main.jade")
+  #legend You are trying to download #{filename}
+  form(action={url} method="post")
+    - if (password) 
+      div
+        label(for="password") This file is password protected:
+        input#password(type="text" name="password")
+    - if (question)
+      div
+        label(for="question") Answer question first
+        input#question(type="text" name="question")
+    #submit
+      button(type="submit" name="download") Download
+      

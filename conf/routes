@@ -8,4 +8,5 @@ POST     /                      controllers.Application.uploadFile()
 GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
 # Downloading
-GET      /*url                  controllers.Application.downloadFile(url)
+GET      /*url                  controllers.Application.dlIndex(url)
+POST     /*url                  controllers.Application.dlSendFile(url)

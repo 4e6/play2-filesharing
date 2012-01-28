@@ -42,9 +42,6 @@ trait Upload {
     file.fold(failure, success)
   }
 
-  def getParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
-    request.body.dataParts.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
-
   def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
 
   def success(f: File) = {
