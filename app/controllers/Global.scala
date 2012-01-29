@@ -6,10 +6,17 @@ import org.squeryl.adapters.H2Adapter
 import models.Files
 
 object Global extends GlobalSettings {
+  def logStatements_?(implicit app: Application) =
+    app.configuration.getBoolean("db.dev.logStatements") getOrElse false
+
   override def onStart(app: Application) {
-    val ds = DB.getDataSource("dev")(app)
-    SessionFactory.concreteFactory =
-      Some(() => Session.create(ds.getConnection, new H2Adapter))
+    implicit val a = app
+
+    SessionFactory.concreteFactory = Some { () =>
+      val s = Session.create(DB.getDataSource("dev").getConnection, new H2Adapter)
+      if (logStatements_?) s.setLogger(Logger.debug(_))
+      s
+    }
 
     transaction {
       try {
