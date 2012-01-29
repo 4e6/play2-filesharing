@@ -27,10 +27,8 @@ trait Download {
         "question" -> f.question.isDefined)
     }
 
-    transaction {
-      val file = files.where(f => f.url === url).headOption //.toSuccess("file").liftFailNel
-      file.fold(success, failure)
-    }
+    val file = transaction(files lookup url)
+    file.fold(success, failure)
   }
 
   def dlSendFile(url: String) = Action {
@@ -40,9 +38,7 @@ trait Download {
 
     def success(f: File) = Ok(f.file)
 
-    val file = transaction {
-      files.where(_.url === url).headOption
-    }
+    val file = transaction(files lookup url)
     file.fold(success, failure)
   }
 

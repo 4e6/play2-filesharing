@@ -1,7 +1,7 @@
 package models
 
+import org.squeryl.{ Schema, KeyedEntity }
 import org.squeryl.PrimitiveTypeMode._
-import org.squeryl.Schema
 import java.sql.Timestamp
 
 class File(val url: String,
@@ -11,7 +11,8 @@ class File(val url: String,
            val deletionTime: Timestamp,
            val password: Option[Array[Byte]],
            val question: Option[String],
-           val answer: Option[Array[Byte]]) {
+           val answer: Option[Array[Byte]])
+    extends KeyedEntity[String] {
   def this() =
     this(
       "url",
@@ -23,10 +24,12 @@ class File(val url: String,
       Some("question"),
       Some(Array())
     )
+
+      def id = url
 }
 
 object Files extends Schema {
-  val bytesPerFile = 25 * 1024 * 1024
+  val fileSize = 25 * 1024 * 1024
 
   val files = table[File]("FILES")
 
@@ -34,7 +37,7 @@ object Files extends Schema {
     declare(
       f.url is (unique, indexed, dbType("varchar(255)")),
       f.name is (dbType("varchar(255)")),
-      f.file is (dbType("binary(" + bytesPerFile + ")")),
+      f.file is (dbType("binary(" + fileSize + ")")),
       f.question is (dbType("varchar(255)")),
       f.password is (dbType("binary(32)")),
       f.answer is (dbType("binary(32)")))
