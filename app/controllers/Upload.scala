@@ -48,5 +48,18 @@ trait Upload {
     transaction(files insert f)
     Ok("Success(" + f.name + ")")
   }
-}
 
+  def checkUrl() = Action { request =>
+    import play.api.libs.json._
+    import Json._
+
+    val content = request.body.asFormUrlEncoded
+    val url = content.flatMap(_.get("url")).flatMap(_.headOption) | ""
+    Logger.debug("checkUrl(" + url + ")")
+    Logger.debug("request body[" + request.body + "]")
+    val file = transaction(files lookup url)
+
+    val msg = file.fold(_ => "reserved", "available")
+    Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
+  }
+}

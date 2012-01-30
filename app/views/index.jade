@@ -6,7 +6,7 @@
       div
         label(for="filename") Select file
         input#filename(type="file" name="file")
-        span#validateUsername
+        span#validateFilename
       div
         label(for="url") Desired URL:
         span http://localhost/
@@ -17,6 +17,22 @@
         input#password(type="text" name="password")
       #submit
         button#upload(type="submit" name="upload") Upload
+  :javascript
+    $(document).ready(function () {
+      $('#url').keyup(function () {
+        var validateUrl = $('#validateUrl');
+        var url = this;
+        $.ajax({
+          url: "checkUrl",
+          data: {"url": url.value},
+          type: "post",
+          dataType: "json",
+          success: function (j) {
+            validateUrl.html(j.msg)
+          }
+        });
+      });
+    });
   :javascript
     $('body').noisy({
       'intensity' : 1,

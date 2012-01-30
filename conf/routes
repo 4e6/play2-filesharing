@@ -4,6 +4,9 @@
 GET      /                      controllers.Application.index()
 POST     /                      controllers.Application.uploadFile()
 
+# API
+POST     /checkUrl              controllers.Application.checkUrl()
+
 # Static resources
 GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
