@@ -1,13 +1,11 @@
 package controllers
 
-import scalaz.{ Logger => SLogger, _ }
+import scalaz.{ Logger => _, _ }
 import Scalaz._
 
 import play.api._
 import play.api.mvc._
-import play.api.mvc.MultipartFormData.FilePart
-
-import java.sql.Timestamp
+import MultipartFormData.FilePart
 
 import Helpers._
 import models.File
@@ -21,7 +19,7 @@ trait Upload {
     Logger.debug("body[" + request.body + "]")
 
     lazy val now = System.currentTimeMillis
-    lazy val to = now + 60 * 60 * 1000
+    lazy val to = now + 1.day
 
     val password = multipartParam("password") map { hash(now) }
     //val password: Validation[NonEmptyList[String], Array[Byte]] = "password".fail.liftFailNel
@@ -34,7 +32,7 @@ trait Upload {
     val file = (filepart |@| password |@| url) { (fp, p, u) =>
       val FilePart(_, name, _, ref) = fp
       val ba = scalax.io.Resource.fromFile(ref.file).byteArray
-      new File(u, name, ba, new Timestamp(now), new Timestamp(to), Some(p), None, None)
+      new File(u, name, ba, now.timestamp, to.timestamp, Some(p), None, None)
     }
 
     file.fold(failure, success)

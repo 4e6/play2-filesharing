@@ -3,6 +3,7 @@ package models
 import org.squeryl.{ Schema, KeyedEntity }
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
+import controllers.Helpers._
 
 class File(val url: String,
            val name: String,
@@ -29,7 +30,7 @@ class File(val url: String,
 }
 
 object Files extends Schema {
-  val fileSize = 25 * 1024 * 1024
+  val fileSize = 25.MB
 
   val files = table[File]("FILES")
 

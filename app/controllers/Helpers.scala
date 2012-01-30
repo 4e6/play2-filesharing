@@ -5,11 +5,31 @@ import Scalaz._
 
 import play.api._
 import play.api.mvc._
-import java.security.MessageDigest
 
 object Helpers {
+  class NumericPimp[A: Numeric](val n: A) {
+    import Numeric._
+    private[this] lazy val num = implicitly[Numeric[A]]
+    private[this] lazy val kibi = num.fromInt(1024)
+
+    /* Returns milliseconds */
+    def sec = num.times(n, num.fromInt(1000))
+    def min = num.times(sec, num.fromInt(60))
+    def hour = num.times(min, num.fromInt(60))
+    def hours = hour
+    def day = num.times(hour, num.fromInt(24))
+    def days = day
+
+    /* Returns bytes */
+    def kB = num.times(n, kibi)
+    def MB = num.times(kB, kibi)
+    def GB = num.times(MB, kibi)
+
+    def timestamp = new java.sql.Timestamp(num.toLong(n))
+  }
+
   def hash(salt: Long)(password: String): Array[Byte] = {
-    val digest = MessageDigest.getInstance("SHA-256")
+    val digest = java.security.MessageDigest.getInstance("SHA-256")
     digest.reset()
     digest.update(salt.toString.getBytes)
     digest.digest(password.getBytes("UTF-8"))
@@ -25,4 +45,6 @@ object Helpers {
     import org.squeryl.PrimitiveTypeMode._
     transaction(models.Files.files lookup url)
   }
+
+  implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
 }
