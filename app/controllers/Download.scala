@@ -5,9 +5,7 @@ import Scalaz._
 
 import play.api._
 import play.api.mvc._
-import play.api.templates.HtmlFormat
 
-import org.squeryl.PrimitiveTypeMode._
 import Helpers._
 import models.File
 import models.Files._

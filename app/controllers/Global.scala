@@ -3,7 +3,6 @@ import play.api.db._
 import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.adapters.H2Adapter
-import models.Files
 
 object Global extends GlobalSettings {
   def logStatements_?(implicit app: Application) =
@@ -20,7 +19,7 @@ object Global extends GlobalSettings {
 
     transaction {
       try {
-        Files.create
+        models.Files.create
       } catch {
         case e @ (_: Exception | _: RuntimeException) =>
       }
