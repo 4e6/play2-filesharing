@@ -24,8 +24,8 @@
         var url = this;
         $.ajax({
           url: "checkUrl",
-          data: {"url": url.value},
           type: "post",
+          data: {"action" : "validate-url", "url" : url.value},
           dataType: "json",
           success: function (j) {
             validateUrl.html(j.msg)

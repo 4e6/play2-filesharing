@@ -25,10 +25,10 @@ trait Upload {
     lazy val now = System.currentTimeMillis
     lazy val to = now + 60 * 60 * 1000
 
-    val password = getParam("password") map { hash(now) }
+    val password = multipartParam("password") map { hash(now) }
     //val password: Validation[NonEmptyList[String], Array[Byte]] = "password".fail.liftFailNel
 
-    val url = getParam("url")
+    val url = multipartParam("url")
     //val url: Validation[NonEmptyList[String], String] = "url".fail.liftFailNel
 
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
@@ -49,17 +49,18 @@ trait Upload {
     Ok("Success(" + f.name + ")")
   }
 
-  def checkUrl() = Action { request =>
+  def checkUrl() = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._
 
-    val content = request.body.asFormUrlEncoded
-    val url = content.flatMap(_.get("url")).flatMap(_.headOption) | ""
-    Logger.debug("checkUrl(" + url + ")")
-    Logger.debug("request body[" + request.body + "]")
-    val file = transaction(files lookup url)
+    Logger.debug("checkUrl request body[" + request.body + "]")
+    val validAction_? = urlParam("action").exists(_ == "validate-url")
 
-    val msg = file.fold(_ => "reserved", "available")
-    Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
+    if (validAction_?) {
+      val file = urlParam("url") >>= { url => transaction(files lookup url) }
+      val msg = file.fold(_ => "reserved", "available")
+      Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
+    } else
+      Ok(toJson(JsObject(Seq())))
   }
 }

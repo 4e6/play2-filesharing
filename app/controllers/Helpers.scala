@@ -15,6 +15,9 @@ object Helpers {
     digest.digest(password.getBytes("UTF-8"))
   }
 
-  def getParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
+  def multipartParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
     request.body.dataParts.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
+
+  def urlParam(key: String)(implicit request: Request[Map[String, Seq[String]]]) =
+    request.body get key >>= (_.headOption)
 }
