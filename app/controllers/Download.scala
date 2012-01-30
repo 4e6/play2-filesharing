@@ -8,6 +8,7 @@ import play.api.mvc._
 import play.api.templates.HtmlFormat
 
 import org.squeryl.PrimitiveTypeMode._
+import Helpers._
 import models.File
 import models.Files._
 
@@ -27,8 +28,7 @@ trait Download {
         "question" -> f.question.isDefined)
     }
 
-    val file = transaction(files lookup url)
-    file.fold(success, failure)
+    getSomeFile(url).fold(success, failure)
   }
 
   def dlSendFile(url: String) = Action {
@@ -38,8 +38,6 @@ trait Download {
 
     def success(f: File) = Ok(f.file)
 
-    val file = transaction(files lookup url)
-    file.fold(success, failure)
+    getSomeFile(url).fold(success, failure)
   }
-
 }

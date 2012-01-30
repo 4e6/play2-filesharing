@@ -5,10 +5,8 @@ import Scalaz._
 
 import play.api._
 import play.api.mvc._
-import play.api.mvc.MultipartFormData._
+import play.api.mvc.MultipartFormData.FilePart
 
-import org.squeryl.PrimitiveTypeMode._
-import scalax.io.Resource
 import java.sql.Timestamp
 
 import Helpers._
@@ -35,7 +33,7 @@ trait Upload {
 
     val file = (filepart |@| password |@| url) { (fp, p, u) =>
       val FilePart(_, name, _, ref) = fp
-      val ba = Resource.fromFile(ref.file).byteArray
+      val ba = scalax.io.Resource.fromFile(ref.file).byteArray
       new File(u, name, ba, new Timestamp(now), new Timestamp(to), Some(p), None, None)
     }
 
@@ -45,6 +43,8 @@ trait Upload {
   def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
 
   def success(f: File) = {
+    import org.squeryl.PrimitiveTypeMode._
+
     transaction(files insert f)
     Ok("Success(" + f.name + ")")
   }
@@ -55,7 +55,7 @@ trait Upload {
 
     Logger.debug("checkUrl request body[" + request.body + "]")
 
-    val file = urlParam("url") >>= { url => transaction(files lookup url) }
+    val file = urlParam("url") >>= getSomeFile
     val msg = file.fold(_ => "reserved", "available")
     Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
   }

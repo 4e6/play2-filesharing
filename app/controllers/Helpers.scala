@@ -20,4 +20,9 @@ object Helpers {
 
   def urlParam(key: String)(implicit request: Request[Map[String, Seq[String]]]) =
     request.body get key >>= (_.headOption)
+
+  def getSomeFile(url: String) = {
+    import org.squeryl.PrimitiveTypeMode._
+    transaction(models.Files.files lookup url)
+  }
 }
