@@ -17,22 +17,7 @@
         input#password(type="text" name="password")
       #submit
         button#upload(type="submit" name="upload") Upload
-  :javascript
-    $(document).ready(function () {
-      $('#url').keyup(function () {
-        var validateUrl = $('#validateUrl');
-        var url = this;
-        $.ajax({
-          url: "checkUrl",
-          type: "post",
-          data: {"action" : "validate-url", "url" : url.value},
-          dataType: "json",
-          success: function (j) {
-            validateUrl.html(j.msg)
-          }
-        });
-      });
-    });
+  script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform-validator.min.js")})
   :javascript
     $('body').noisy({
       'intensity' : 1,

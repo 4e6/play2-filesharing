@@ -49,18 +49,14 @@ trait Upload {
     Ok("Success(" + f.name + ")")
   }
 
-  def checkUrl() = Action(parse.urlFormEncoded) { implicit request =>
+  def checkUrl = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._
 
     Logger.debug("checkUrl request body[" + request.body + "]")
-    val validAction_? = urlParam("action").exists(_ == "validate-url")
 
-    if (validAction_?) {
-      val file = urlParam("url") >>= { url => transaction(files lookup url) }
-      val msg = file.fold(_ => "reserved", "available")
-      Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
-    } else
-      Ok(toJson(JsObject(Seq())))
+    val file = urlParam("url") >>= { url => transaction(files lookup url) }
+    val msg = file.fold(_ => "reserved", "available")
+    Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
   }
 }
