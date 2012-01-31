@@ -18,13 +18,26 @@ trait Upload {
     Logger.debug("Start file uploading...")
     Logger.debug("body[" + request.body + "]")
 
+    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+
+    def success(f: File) = {
+      import org.squeryl.PrimitiveTypeMode._
+
+      transaction(files insert f)
+      Ok("Success(" + f.name + ")")
+    }
+
+    def validUrl_?(url: String) =
+      if (url.isEmpty) "invalid url".fail.liftFailNel
+      else url.success.liftFailNel
+
     lazy val now = System.currentTimeMillis
     lazy val to = now + 1.day
 
     val password = multipartParam("password") map { hash(now) }
     //val password: Validation[NonEmptyList[String], Array[Byte]] = "password".fail.liftFailNel
 
-    val url = multipartParam("url")
+    val url = multipartParam("url") flatMap validUrl_?
     //val url: Validation[NonEmptyList[String], String] = "url".fail.liftFailNel
 
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
@@ -38,23 +51,14 @@ trait Upload {
     file.fold(failure, success)
   }
 
-  def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
-
-  def success(f: File) = {
-    import org.squeryl.PrimitiveTypeMode._
-
-    transaction(files insert f)
-    Ok("Success(" + f.name + ")")
-  }
-
   def checkUrl = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._
 
     Logger.debug("checkUrl request body[" + request.body + "]")
 
-    val file = urlParam("url") >>= getSomeFile
-    val msg = file.fold(_ => "reserved", "available")
-    Ok(toJson(JsObject(Seq("msg" -> JsString(msg)))))
+    val available_? = urlParam("url") >>= getSomeFile isEmpty
+
+    Ok(toJson(JsObject(Seq("available" -> JsBoolean(available_?)))))
   }
 }

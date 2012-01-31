@@ -1,12 +1,12 @@
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
-  form(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data")
+  form(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data" onsubmit="return validateForm()")
     fieldset
       legend Upload file
       div
-        label(for="filename") Select file
-        input#filename(type="file" name="file")
-        span#validateFilename
+        label(for="file") Select file
+        input#file(type="file" name="file")
+        span#validateFile
       div
         label(for="url") Desired URL:
         span http://localhost/
@@ -17,7 +17,7 @@
         input#password(type="text" name="password")
       #submit
         button#upload(type="submit" name="upload") Upload
-  script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform-validator.min.js")})
+  script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})
   :javascript
     $('body').noisy({
       'intensity' : 1,
