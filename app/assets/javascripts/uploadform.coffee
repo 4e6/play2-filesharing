@@ -2,24 +2,27 @@ root = exports ? this
 
 $('#file').change ->
   $('#validateFile').removeClass('ok error')
-  isValidFile()
+  validateFile()
 
-$('#url').keyup ->
-  url = @value
-  if not isValidUrl()
-    clearTimeout @timer if @timer
-    return @lastValue = @value
+$('#url').blur -> validateUrlWithAjax(this)
 
-  if @value isnt @lastValue
-    clearTimeout @timer if @timer
+$('#url').keyup -> validateUrlWithAjax(this)
+
+validateUrlWithAjax = (u) ->
+  unless isSaneUrl()
+    clearTimeout u.timer if u.timer?
+    return u.lastValue = u.value
+
+  if u.value isnt u.lastValue
+    clearTimeout u.timer if u.timer?
     $('#validateUrl').removeClass("ok error").html '<img src="/assets/images/ajax-loader.gif" /> checking availability...'
 
-    @timer = setTimeout(
+    u.timer = setTimeout(
       -> $.ajax
         url: 'checkUrl'
         type: 'post'
         data:
-          'url': $.trim url
+          'url': $.trim u.value
         dataType: 'json'
         success: (j) ->
           if j.available
@@ -31,9 +34,13 @@ $('#url').keyup ->
           $('#validateUrl').addClass(c).html msg
       1200
     )
-    @lastValue = @value
+    u.lastValue = u.value
 
-isValidUrl = ->
+setError = (elem) -> (msg) ->
+  elem.removeClass('ok').addClass('error').html msg
+  false
+
+isSaneUrl = ->
   url = $('#url').val()
   handler = setError $('#validateUrl')
   nameCheck = /^[^\s?&]+[^?&]*$/
@@ -46,16 +53,15 @@ isValidUrl = ->
     handler "URL can't contain '?' and '&' symbols"
   else true
 
-setError = (elem) -> (msg) ->
-  elem.removeClass('ok').addClass('error').html msg
-  false
+isOkUrl = -> $('#validateUrl').hasClass 'ok'
 
-isValidFile = ->
+validateFile = ->
   unless $('#file').val()
     setError($('#validateFile')) 'Please choose a file'
   else
     $('#validateFile').addClass('ok').html 'Ok'
 
-/* validUrl will not performen until validFile becomes true */
+validators = [validateFile, isSaneUrl, isOkUrl]
+
 root.validateForm = ->
-  isValidFile() and isValidUrl() and $('#validateUrl').hasClass 'ok'
+  validators.map((v) -> v()).every((r) -> r)
