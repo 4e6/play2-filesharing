@@ -39,7 +39,7 @@ object Helpers {
     request.body.dataParts.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
 
   def urlParam(key: String)(implicit request: Request[Map[String, Seq[String]]]) =
-    request.body get key >>= (_.headOption)
+    request.body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
 
   def getSomeFile(url: String) = {
     import org.squeryl.PrimitiveTypeMode._

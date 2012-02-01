@@ -14,6 +14,13 @@ import models.Files._
 trait Upload {
   self: Controller =>
 
+  def valid_?(url: String) =
+    if (url matches """^[^\s?&]+[^?&]$""") url.successNel
+    else "invalid url".failNel
+
+  def available_?(url: String) =
+    getSomeFile(url).cata(_ => "reserved".failNel, url.successNel)
+
   def uploadFile = Action(parse.multipartFormData) { implicit request =>
     Logger.debug("Start file uploading...")
     Logger.debug("body[" + request.body + "]")
@@ -22,23 +29,16 @@ trait Upload {
 
     def success(f: File) = {
       import org.squeryl.PrimitiveTypeMode._
-
       transaction(files insert f)
       Ok("Success(" + f.name + ")")
     }
 
-    def validUrl_?(url: String) =
-      if (url.isEmpty) "invalid url".fail.liftFailNel
-      else url.success.liftFailNel
-
     lazy val now = System.currentTimeMillis
     lazy val to = now + 1.day
 
-    val password = multipartParam("password") map { hash(now) }
-    //val password: Validation[NonEmptyList[String], Array[Byte]] = "password".fail.liftFailNel
+    val password = multipartParam("password") map hash(now)
 
-    val url = multipartParam("url") flatMap validUrl_?
-    //val url: Validation[NonEmptyList[String], String] = "url".fail.liftFailNel
+    val url = multipartParam("url") flatMap valid_? flatMap available_?
 
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
@@ -57,8 +57,14 @@ trait Upload {
 
     Logger.debug("checkUrl request body[" + request.body + "]")
 
-    val available_? = urlParam("url") >>= getSomeFile isEmpty
+    def failure(l: NonEmptyList[String]) = l.list mkString ", "
 
-    Ok(toJson(JsObject(Seq("available" -> JsBoolean(available_?)))))
+    def success(f: String) = "available"
+
+    val file = urlParam("url") flatMap available_?
+
+    val msg = file.fold(failure, success)
+
+    Ok(toJson(JsObject(Seq("available" -> JsBoolean(file.isSuccess), "msg" -> JsString(msg)))))
   }
 }
