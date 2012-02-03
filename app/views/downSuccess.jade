@@ -5,15 +5,22 @@
 - attributes("title") = "Download file"
 - layout("layouts/main.jade")
   #legend You are trying to download #{filename}
-  form(action={url} method="post")
+  -# form(action={url} method="post" onsubmit="return checkPassword()")
+  #form
     - if (password) 
       div
         label(for="password") This file is password protected:
         input#password(type="text" name="password")
+        span#passwordLoader(style="display: none;")
+          img(src={routes.Assets.at("images/ajax-loader.gif")})
+        span#passwordHint
+      .submit
+        button(type="button" name="download" onclick="checkPassword()") Check password
     - if (question)
       div
         label(for="question") Answer question first
         input#question(type="text" name="question")
-    #submit
-      button(type="submit" name="download") Download
-      
+      .submit
+        button(type="button" onclick="checkAnswer()") Check answer
+    input#url(type="hidden" value={url})
+  script(type="text/javascript" src={routes.Assets.at("javascripts/downloadform.js")})

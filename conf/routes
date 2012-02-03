@@ -6,6 +6,7 @@ POST     /                      controllers.Application.uploadFile()
 
 # API
 POST     /checkUrl              controllers.Application.checkUrl()
+POST     /checkPassword         controllers.Application.checkPassword()
 
 # Static resources
 GET      /assets/*file          controllers.Assets.at(path="/public", file)
