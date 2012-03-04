@@ -4,4 +4,4 @@ resolvers ++= Seq(
   Resolver.file("Local Play20 Repository", file("/opt/git-repos/play20/repository/local"))(Resolver.ivyStylePatterns)
 )
 
-addSbtPlugin("play" % "sbt-plugin" % "2.0-RC1-SNAPSHOT")
+addSbtPlugin("play" % "sbt-plugin" % "2.0-SNAPSHOT")
