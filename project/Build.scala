@@ -22,7 +22,7 @@ object ApplicationBuild extends Build {
 
   val appSettings = Seq(
     resolvers ++= appResolvers,
-    scalacOptions += "-Xlint",
+    scalacOptions ++= Seq("-Xlint", "-deprecation"),
     javaOptions in run += "-Xmx2G -XX:MaxPermSize=512m",
     ensimeConfig := sexp(
       key(":formatting-prefs"), sexp(
