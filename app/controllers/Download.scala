@@ -11,13 +11,14 @@ import Helpers._
 trait Download {
   self: Controller with ScalateEngine =>
 
-  def dlIndex(url: String) = Action {
+  def downloadIndex(url: String) = Action {
     def failure = Ok {
-      render("views/downFailure.jade", "filename" -> url)
+      render("views/fileNotFound.jade", "filename" -> url)
     }
 
     def success(f: models.File) = Ok {
-      render("views/downSuccess.jade",
+      render(
+        "views/downloadIndex.jade",
         "url" -> url,
         "filename" -> f.name,
         "password" -> f.password.isDefined,
@@ -27,14 +28,17 @@ trait Download {
     getSomeFile(url).fold(success, failure)
   }
 
-  def dlSendFile(url: String) = Action {
-    def failure = Ok {
-      render("views/downFailure.jade", "filename" -> url)
+  def retrieveFile(url: String, password: String) = {
+    def success(f: models.File) = Action {
+      Ok(f.file).withHeaders("Content-Disposition" -> ("attachment; filename=" + f.name))
+    }
+    def failure = Action {
+      Ok { render("views/fileNotFound.jade", "filename" -> url) }
     }
 
-    def success(f: models.File) = Ok(f.file)
+    val file = getSomeFile(url) filter { isRightPassword(_, password) }
 
-    getSomeFile(url).fold(success, failure)
+    file.cata(success, failure)
   }
 
   def checkPassword = Action(parse.urlFormEncoded) { implicit request =>
@@ -43,10 +47,9 @@ trait Download {
 
     val file = urlParam("url").toOption flatMap getSomeFile
     val pass = urlParam("password").toOption
-    val correct_? = (file |@| pass) { (f, p) =>
-      hash(f.creationTime.getTime)(p) sameElements f.password.getOrElse(Array.empty)
-    }
 
-    Ok(toJson(JsObject(Seq("correct" -> JsBoolean(correct_? | false)))))
+    val isCorrect = (file |@| pass) { isRightPassword }
+    Ok(toJson(JsObject(Seq("correct" -> JsBoolean(isCorrect | false)))))
   }
 }
+
