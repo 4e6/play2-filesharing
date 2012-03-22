@@ -1,29 +1,39 @@
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
-  form(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data" onsubmit="return validateForm()")
-    fieldset
-      legend Upload file
-      div
-        label(for="file") Select file
-        input#file(type="file" name="file")
-        span#validateFile
-      div
-        label(for="url") Desired URL:
-        span http://localhost/
-        input#url(type="text" name="url")
-        span#validateUrl
-      div
-        label(for="password") Password
-        input#password(type="text" name="password")
-      #submit
-        button#upload(type="submit" name="upload") Upload
+  .navbar.navbar-fixed-top
+    .navbar-inner
+      .container-fluid
+        a.btn.btn-navbar(data-toggle="collapse" data-target=".nav-collapse")
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a.brand(href="/") Web Clipboard
+        .nav-collapse
+          ul.nav
+            li.active
+              a(href="#") Home
+            li
+              a(href="#about") About
+  .container-fluid
+    .row-fluid
+      .span2 &nbsp
+      .span8.well
+        form(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data" onsubmit="return validateForm()")
+          fieldset
+            legend Upload file
+            div
+              label(for="file") Select file
+              input#file.input-file(type="file" name="file")
+              span#validateFile
+            div
+              label(for="url") Desired URL:
+              span http://localhost/
+              input#url(type="text" name="url")
+              span#validateUrl
+            div
+              label(for="password") Password
+              input#password(type="text" name="password")
+            #submit
+              button#upload.btn.btn-primary(type="submit" name="upload") Upload
+      .span2 &nbsp
   script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})
-  :javascript
-    $('body').noisy({
-      'intensity' : 1,
-      'size' : 200,
-      'opacity' : 0.050,
-      'fallback' : '',
-      'monochrome' : false
-    }).css('background-color', '#dbdbdb');
-
