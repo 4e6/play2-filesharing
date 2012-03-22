@@ -30,7 +30,9 @@ trait Download {
 
   def retrieveFile(url: String, password: String) = {
     def success(f: models.File) = Action {
-      Ok(f.file).withHeaders("Content-Disposition" -> ("attachment; filename=" + f.name))
+      Ok.sendFile(
+        content = new java.io.File(f.path),
+        fileName = _ => f.name)
     }
     def failure = Action {
       Ok { render("views/fileNotFound.jade", "filename" -> url) }

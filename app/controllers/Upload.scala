@@ -14,11 +14,11 @@ import models.Files._
 trait Upload {
   self: Controller =>
 
-  def valid_?(url: String) =
-    if (url matches """^[^\s?&]+[^?&]$""") url.successNel
+  def isValid(url: String) =
+    if (url matches """^[^\s?&]+[^?&]*$""") url.successNel
     else "invalid url".failNel
 
-  def available_?(url: String) =
+  def isAvailable(url: String) =
     getSomeFile(url).cata(_ => "reserved".failNel, url.successNel)
 
   def uploadFile = Action(parse.multipartFormData) { implicit request =>
@@ -38,14 +38,22 @@ trait Upload {
 
     val password = multipartParam("password") map hash(now)
 
-    val url = multipartParam("url") flatMap valid_? flatMap available_?
+    val url = multipartParam("url") flatMap isValid flatMap isAvailable
 
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
     val file = (filepart |@| password |@| url) { (fp, p, u) =>
+      import libs.Files.copyFile
+      import Play.current
+
       val FilePart(_, name, _, ref) = fp
-      val ba = scalax.io.Resource.fromFile(ref.file).byteArray
-      new File(u, name, ba, now.timestamp, to.timestamp, Some(p), None, None)
+      val path = "files/" + u + "/" + name
+      val dest = Play.getFile(path)
+
+      copyFile(ref.file, dest)
+      ref.clean
+
+      new File(u, name, path, now.timestamp, to.timestamp, Some(p), None, None)
     }
 
     file.fold(failure, success)
@@ -61,7 +69,7 @@ trait Upload {
 
     def success(f: String) = "available"
 
-    val file = urlParam("url") flatMap available_?
+    val file = urlParam("url") flatMap isAvailable
 
     val msg = file.fold(failure, success)
 
