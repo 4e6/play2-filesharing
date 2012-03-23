@@ -26,13 +26,24 @@
               input#file.input-file(type="file" name="file")
               span#validateFile
             div
-              label(for="url") Desired URL:
+              -# label(for="url") Desired URL:
               span http://localhost/
-              input#url(type="text" name="url")
+              input#url(type="text" name="url" placeholder="Annual report.docx")
               span#validateUrl
-            div
-              label(for="password") Password
-              input#password(type="text" name="password")
+            .tabbable
+              ul.nav.nav-tabs
+                li.active
+                  a(href="#1" data-toggle="tab") Password
+                li
+                  a(href="#2" data-toggle="tab") Question
+              .tab-content
+                .tab-pane.fade.active.in(id="1")
+                  input#password(type="password" name="password" placeholder="Password")
+                .tab-pane.fade(id="2")
+                  p
+                    input#question(type="text" name="question" placeholder="Your question")
+                  p
+                    input#answer(type="text" name="answer" placeholder="Answer")
             #submit
               button#upload.btn.btn-primary(type="submit" name="upload") Upload
       .span2 &nbsp
