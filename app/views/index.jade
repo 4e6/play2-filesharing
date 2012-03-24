@@ -1,53 +1,34 @@
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
-  .navbar.navbar-fixed-top
-    .navbar-inner
-      .container-fluid
-        a.btn.btn-navbar(data-toggle="collapse" data-target=".nav-collapse")
-          span.icon-bar
-          span.icon-bar
-          span.icon-bar
-        a.brand(href="/") Web Clipboard
-        .nav-collapse
-          ul.nav
-            li.active
-              a(href="#") Home
-            li
-              a(href="#about") About
-  .container-fluid
-    .row-fluid
-      .span2 &nbsp
-      .span8.well
-        form#upload(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data")
-          fieldset
-            legend Upload file
-            .control-group
-              input#file.input-file(type="file" name="file")
-              span#validateFile.help-inline
-            .control-group
-              span http://localhost/
-              input#url(type="text" name="url" placeholder="Annual report.docx")
-              span#validateUrl.help-inline
-            .tabbable
-              ul.nav.nav-tabs
-                li.active
-                  a(href="#1" data-toggle="tab") Password
-                li
-                  a(href="#2" data-toggle="tab") Question
-              .tab-content
-                #1.tab-pane.active
-                  p.control-group
-                    input#password(type="password" name="password" placeholder="Password")
-                    span#validatePassword
-                #2.tab-pane
-                  p.control-group
-                    input#question(type="text" name="question" placeholder="Your question")
-                    span#validateQuestion
-                  p.control-group
-                    input#answer(type="text" name="answer" placeholder="Answer")
-                    span#validateAnswer
-            input#choice(type="hidden" name="choice" value="password")
-            div
-              button.btn.btn-primary(type="submit") Upload
-      .span2 &nbsp
+  form#upload(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data")
+    fieldset
+      legend Upload file
+      .control-group
+        input#file.input-file(type="file" name="file")
+        span#validateFile.help-inline
+      .control-group
+        span http://localhost/
+        input#url(type="text" name="url" placeholder="Annual report.docx")
+        span#validateUrl.help-inline
+      .tabbable
+        ul.nav.nav-tabs
+          li.active
+            a(href="#1" data-toggle="tab") Password
+          li
+            a(href="#2" data-toggle="tab") Question
+        .tab-content
+          #1.tab-pane.active
+            p.control-group
+              input#password(type="password" name="password" placeholder="Password")
+              span#validatePassword
+          #2.tab-pane
+            p.control-group
+              input#question(type="text" name="question" placeholder="Your question")
+              span#validateQuestion
+            p.control-group
+              input#answer(type="text" name="answer" placeholder="Answer")
+              span#validateAnswer
+      input#choice(type="hidden" name="choice" value="password")
+      div
+        button.btn.btn-primary(type="submit") Upload
   script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})

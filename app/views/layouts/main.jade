@@ -13,4 +13,23 @@ html(lang="en")
     script(type="text/javascript" src={routes.Assets.at("javascripts/bootstrap.min.js")})
     -# script(type="text/javascript" src={routes.Assets.at("javascripts/jquery.noisy.min.js")})
   body
-    != body
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container-fluid
+          a.btn.btn-navbar(data-toggle="collapse" data-target=".nav-collapse")
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.brand(href="/") Web Clipboard
+          .nav-collapse
+            ul.nav
+              li.active
+                a(href="#") Home
+              li
+                a(href="#about") About
+    .container-fluid
+      .row-fluid
+        .span2 &nbsp
+        .span8.well
+          != body
+        .span2 &nbsp
