@@ -1,21 +1,59 @@
 root = exports ? this
 
-$('#file').change ->
-  $('#validateFile').removeClass('ok error')
-  validateFile()
+# Auxiliary methods
+endsWith = (str, suffix) ->
+  str.indexOf(suffix, str.length - suffix.length) isnt -1
+
+setError = (elem) -> (msg) ->
+  elem.parent().removeClass('success').addClass('error')
+  elem.html msg
+  false
+
+setSuccess = (elem) ->
+  elem.parent().removeClass('error').addClass('success')
+  elem.html '✓'
+
+cleanValidation = (elem, msg = '') ->
+  elem.parent().removeClass('success error')
+  elem.html msg
+
+# Event handlers
+$(document).ready -> $('#upload').submit validateForm
+
+$('#file').change -> validateFile()
 
 $('#url').blur -> validateUrlWithAjax(this)
 
 $('#url').keyup -> validateUrlWithAjax(this)
 
+# Validators
+validateFile = ->
+  unless $('#file').val()
+    setError($('#validateFile')) 'Please choose a file'
+  else
+    setSuccess $('#validateFile')
+
+validateUrl = ->
+  url = $('#url').val()
+  handler = setError $('#validateUrl')
+  nameCheck = /^[^\s?&]+[^?&]*$/
+  wsCheck = /^\S/
+  if not url
+    handler "Please specify a URL"
+  else if not wsCheck.test url
+    handler "URL can't srarts with whitespace"
+  else if not nameCheck.test url
+    handler "URL can't contain '?' and '&' symbols"
+  else true
+
 validateUrlWithAjax = (u) ->
-  unless isSaneUrl()
+  unless validateUrl()
     clearTimeout u.timer if u.timer?
     return u.lastValue = u.value
 
   if u.value isnt u.lastValue
     clearTimeout u.timer if u.timer?
-    $('#validateUrl').removeClass("ok error").html '<img src="/assets/images/ajax-loader.gif" /> checking availability...'
+    cleanValidation $('#validateUrl'), '<img src="/assets/images/ajax-loader.gif" /> checking availability...'
 
     u.timer = setTimeout(
       -> $.ajax
@@ -26,42 +64,49 @@ validateUrlWithAjax = (u) ->
         dataType: 'json'
         success: (j) ->
           if j.available
-            msg = 'available'
-            c = 'ok'
+            setSuccess $('#validateUrl')
           else
-            msg = 'reserved'
-            c = 'error'
-          $('#validateUrl').addClass(c).html msg
+            setError($('#validateUrl')) 'reserved'
       1200
     )
     u.lastValue = u.value
 
-setError = (elem) -> (msg) ->
-  elem.removeClass('ok').addClass('error').html msg
-  false
+# redundant?
+isOkUrl = -> not $('#validateUrl').parent().hasClass 'error'
 
-isSaneUrl = ->
-  url = $('#url').val()
-  handler = setError $('#validateUrl')
-  nameCheck = /^[^\s?&]+[^?&]*$/
-  wsCheck = /^\S/
-  if not url
-    handler 'Please specify a URL'
-  else if not wsCheck.test url
-    handler "URL can't srarts wiht whitespace"
-  else if not nameCheck.test url
-    handler "URL can't contain '?' and '&' symbols"
+validatePassword = ->
+  if $('#1').hasClass 'active'
+    unless $('#password').val()?.length
+      setError($('#validatePassword')) 'Enter password'
+    else
+      setSuccess $('#validatePassword')
   else true
 
-isOkUrl = -> $('#validateUrl').hasClass 'ok'
+validateQuestion = ->
+  if $('#2').hasClass 'active'
+    unless $('#question').val()?.length
+      setError($('#validateQuestion')) 'Please specify a question'
+    else setSuccess $('#validateQuestion')
+  else true
 
-validateFile = ->
-  unless $('#file').val()
-    setError($('#validateFile')) 'Please choose a file'
-  else
-    $('#validateFile').addClass('ok').html 'Ok'
+validateAnswer = ->
+  if $('#2').hasClass 'active'
+    unless $('#answer').val()?.length
+      setError($('#validateAnswer')) 'specify an answer'
+    else setSuccess $('#validateAnswer')
+  else true
 
-validators = [validateFile, isSaneUrl, isOkUrl]
+# Validation
+validators = [validateFile, validateUrl, isOkUrl, validatePassword, validateQuestion, validateAnswer]
 
 root.validateForm = ->
   validators.map((v) -> v()).every((r) -> r)
+
+# Bootstrap tab switching
+$('a[data-toggle="tab"]').on 'show', (e) ->
+  if endsWith(e.relatedTarget.href, '1')
+    cleanValidation $('#validatePassword')
+    $('#password').val ''
+    $('#choice').val 'question'
+  else
+    $('#choice').val 'password'

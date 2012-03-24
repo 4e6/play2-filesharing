@@ -14,11 +14,11 @@ import models.Files._
 trait Upload {
   self: Controller =>
 
-  def isValid(url: String) =
+  def valid(url: String) =
     if (url matches """^[^\s?&]+[^?&]*$""") url.successNel
     else "invalid url".failNel
 
-  def isAvailable(url: String) =
+  def available(url: String) =
     getSomeFile(url).cata(_ => "reserved".failNel, url.successNel)
 
   def uploadFile = Action(parse.multipartFormData) { implicit request =>
@@ -36,13 +36,18 @@ trait Upload {
     lazy val now = System.currentTimeMillis
     lazy val to = now + 1.day
 
+    val url = multipartParam("url") flatMap valid flatMap available
     val password = multipartParam("password") map hash(now)
-
-    val url = multipartParam("url") flatMap isValid flatMap isAvailable
+    val question = multipartParam("question")
+    val answer = multipartParam("answer") map hash(now)
+    val choice = multipartParam("choice") flatMap {
+      case c @ ("password" | "question") => c.successNel
+      case _ => "invalid choice".failNel
+    }
 
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
-    val file = (filepart |@| password |@| url) { (fp, p, u) =>
+    val file = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
       import libs.Files.copyFile
       import Play.current
 
@@ -53,7 +58,12 @@ trait Upload {
       copyFile(ref.file, dest)
       ref.clean
 
-      new File(u, name, path, now.timestamp, to.timestamp, Some(p), None, None)
+      c match {
+        case "password" => new File(u, name, path, now.timestamp, to.timestamp, Some(p), None, None)
+        case "question" => new File(u, name, path, now.timestamp, to.timestamp, None, Some(q), Some(a))
+      }
+
+      //new File(u, name, path, now.timestamp, to.timestamp, Some(p), Some(q), Some(a))
     }
 
     file.fold(failure, success)
@@ -69,7 +79,7 @@ trait Upload {
 
     def success(f: String) = "available"
 
-    val file = urlParam("url") flatMap isAvailable
+    val file = urlParam("url") flatMap available
 
     val msg = file.fold(failure, success)
 

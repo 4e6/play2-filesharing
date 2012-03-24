@@ -18,18 +18,16 @@
     .row-fluid
       .span2 &nbsp
       .span8.well
-        form(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data" onsubmit="return validateForm()")
+        form#upload(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data")
           fieldset
             legend Upload file
-            div
-              label(for="file") Select file
+            .control-group
               input#file.input-file(type="file" name="file")
-              span#validateFile
-            div
-              -# label(for="url") Desired URL:
+              span#validateFile.help-inline
+            .control-group
               span http://localhost/
               input#url(type="text" name="url" placeholder="Annual report.docx")
-              span#validateUrl
+              span#validateUrl.help-inline
             .tabbable
               ul.nav.nav-tabs
                 li.active
@@ -37,14 +35,19 @@
                 li
                   a(href="#2" data-toggle="tab") Question
               .tab-content
-                .tab-pane.fade.active.in(id="1")
-                  input#password(type="password" name="password" placeholder="Password")
-                .tab-pane.fade(id="2")
-                  p
+                #1.tab-pane.active
+                  p.control-group
+                    input#password(type="password" name="password" placeholder="Password")
+                    span#validatePassword
+                #2.tab-pane
+                  p.control-group
                     input#question(type="text" name="question" placeholder="Your question")
-                  p
+                    span#validateQuestion
+                  p.control-group
                     input#answer(type="text" name="answer" placeholder="Answer")
-            #submit
-              button#upload.btn.btn-primary(type="submit" name="upload") Upload
+                    span#validateAnswer
+            input#choice(type="hidden" name="choice" value="password")
+            div
+              button.btn.btn-primary(type="submit") Upload
       .span2 &nbsp
   script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})

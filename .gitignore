@@ -1,5 +1,7 @@
 logs
 /files
+/public/javascripts
+/public/stylesheets
 project/project
 target
 *.db
