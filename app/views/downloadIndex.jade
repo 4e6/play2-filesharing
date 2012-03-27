@@ -1,27 +1,31 @@
 -@ val url: String
 -@ val filename: String
 -@ val password: Boolean = false
--@ val question: Boolean = false
+-@ val question: String = ""
 - attributes("title") = "Download file"
 - layout("layouts/main.jade")
   #legend You are trying to download #{filename}
   -# form(action={url} method="get" onsubmit="checkPassword")
   #form
     - if (password) 
-      div
+      .control-group
         label(for="password") This file is password protected:
-        input#password(type="text" name="password")
-        span#passwordLoader(style="display: none;")
+        input#password(type="text" name="password" placeholder="Password")
+        span#loader(style="display: none;")
           img(src={routes.Assets.at("images/ajax-loader.gif")})
-        span#passwordHint
+        span#hint.help-inline
       .submit
-        button#download(type="button" name="download" onclick="checkPassword()") Download
-    - if (question)
-      div
-        label(for="question") Answer question first
-        input#question(type="text" name="question")
+        button#download.btn.btn-primary(type="button" onclick="check('password')") Download
+    - else
+      .control-group
+        label(for="question") Answer question first:
+        div= question
+        input#answer(type="text" name="answer")
+        span#loader(style="display: none;")
+          img(src={routes.Assets.at("images/ajax-loader.gif")})
+        span#hint.help-inline
       .submit
-        button#download(type="button" onclick="checkAnswer()") Check answer
+        button#download.btn.btn-primary(type="button" onclick="check('answer')") Download
     input#url(type="hidden" value={url})
   iframe#holder(style="display: none; visibility: hidden;")
   script(type="text/javascript" src={routes.Assets.at("javascripts/downloadform.js")})

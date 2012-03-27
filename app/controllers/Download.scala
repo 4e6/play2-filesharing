@@ -16,19 +16,20 @@ trait Download {
       render("views/fileNotFound.jade", "filename" -> url)
     }
 
-    def success(f: models.File) = Ok {
-      render(
-        "views/downloadIndex.jade",
+    def success(f: models.File) = {
+      val params = Map(
         "url" -> url,
         "filename" -> f.name,
         "password" -> f.password.isDefined,
-        "question" -> f.question.isDefined)
+        "question" -> f.question.getOrElse(""))
+
+      Ok { render("views/downloadIndex.jade", params) }
     }
 
     getSomeFile(url).fold(success, failure)
   }
 
-  def retrieveFile(url: String, password: String) = {
+  def retrieveFile(url: String, key: String, data: String) = {
     def success(f: models.File) = Action {
       Ok.sendFile(
         content = new java.io.File(f.path),
@@ -38,19 +39,21 @@ trait Download {
       Ok { render("views/fileNotFound.jade", "filename" -> url) }
     }
 
-    val file = getSomeFile(url) filter { isRightPassword(_, password) }
+    val file = getSomeFile(url) filter { verifyData(_, key, data) }
 
     file.cata(success, failure)
   }
 
-  def checkPassword = Action(parse.urlFormEncoded) { implicit request =>
+  def checkData = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._
 
     val file = urlParam("url").toOption flatMap getSomeFile
-    val pass = urlParam("password").toOption
+    val key = urlParam("key").toOption
+    val data = urlParam("data").toOption
 
-    val isCorrect = (file |@| pass) { isRightPassword }
+    val isCorrect = (file |@| key |@| data) { verifyData }
+
     Ok(toJson(JsObject(Seq("correct" -> JsBoolean(isCorrect | false)))))
   }
 }

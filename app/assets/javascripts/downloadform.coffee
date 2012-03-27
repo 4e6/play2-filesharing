@@ -1,26 +1,29 @@
 root = exports ? this
 
-root.checkPassword = ->
+root.check = (key) ->
   url = $('#url').val()
-  pass = $.trim $('#password').val()
+  data = $.trim $("##{key}").val()
   $.ajax
-    url: '__checkPassword'
+    url: '__checkData'
     type: 'post'
     data:
       'url': url
-      'password': pass
+      'key': key
+      'data': data
     dataType: 'json'
-    beforeSend: -> $('#passwordLoader').show()
-    complete: -> $('#passwordLoader').hide()
+    beforeSend: ->
+      cleanValidation $()
+      $('#loader').show()
+    complete: -> $('#loader').hide()
     success: (j) ->
       if j.correct
-        $('#passwordHint').html "correct"
-        getFile(url, pass)
+        $('#hint').html "correct"
+        getFile(url, key, data)
         # window.location.replace("http://localhost:9000")
-        $('#download').attr("disabled", "disabled")
+        $('#download').attr 'disabled', 'disabled'
       else
-        $('#passwordHint').html "try again"
-    error: (j) -> $('#passwordHint').html j
+        $('#hint').html "try again"
+    error: (j) -> $('#hint').html j
 
-getFile = (url, pass) ->
-  $('#holder').attr("src", "__retrieve?url=#{url}&password=#{pass}")
+getFile = (url, key, data) ->
+  $('#holder').attr "src", "__retrieve?url=#{url}&key=#{key}&data=#{data}"

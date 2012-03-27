@@ -35,8 +35,14 @@ object Helpers {
     digest.digest(password.getBytes("UTF-8"))
   }
 
-  def isRightPassword(file: models.File, pass: String) =
-    hash(file.creationTime.getTime)(pass) sameElements file.password.getOrElse(Array.empty)
+  def verifyData(file: models.File, key: String, data: String) = {
+    // to models.file ->
+    val info = key match {
+      case "password" => file.password
+      case "answer" => file.answer
+    }
+    info getOrElse Array.empty sameElements hash(file.creationTime.getTime)(data)
+  }
 
   def multipartParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
     request.body.dataParts.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel

@@ -1,22 +1,5 @@
 root = exports ? this
 
-# Auxiliary methods
-endsWith = (str, suffix) ->
-  str.indexOf(suffix, str.length - suffix.length) isnt -1
-
-setError = (elem) -> (msg) ->
-  elem.parent().removeClass('success').addClass('error')
-  elem.html msg
-  false
-
-setSuccess = (elem) ->
-  elem.parent().removeClass('error').addClass('success')
-  elem.html '✓'
-
-cleanValidation = (elem, msg = '') ->
-  elem.parent().removeClass('success error')
-  elem.html msg
-
 # Event handlers
 $(document).ready -> $('#upload').submit validateForm
 

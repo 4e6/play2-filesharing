@@ -6,11 +6,11 @@ POST     /                      controllers.Application.uploadFile()
 
 # API
 POST     /checkUrl              controllers.Application.checkUrl()
-POST     /__checkPassword         controllers.Application.checkPassword()
+POST     /__checkData           controllers.Application.checkData()
 
 # Static resources
 GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
 # Downloading
-GET      /__retrieve            controllers.Application.retrieveFile(url, password)
+GET      /__retrieve            controllers.Application.retrieveFile(url, key, data)
 GET      /*url                  controllers.Application.downloadIndex(url)
