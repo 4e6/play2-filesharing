@@ -1,5 +1,7 @@
 root = exports ? this
 
+$('#password, #answer').focus -> cleanValidation $('#hint')
+
 root.check = (key) ->
   url = $('#url').val()
   data = $.trim $("##{key}").val()
@@ -17,12 +19,12 @@ root.check = (key) ->
     complete: -> $('#loader').hide()
     success: (j) ->
       if j.correct
-        $('#hint').html "correct"
+        setSuccess $('#hint'), "correct"
         getFile(url, key, data)
         # window.location.replace("http://localhost:9000")
         $('#download').attr 'disabled', 'disabled'
       else
-        $('#hint').html "try again"
+        setError $('#hint'), "try again"
     error: (j) -> $('#hint').html j
 
 getFile = (url, key, data) ->
