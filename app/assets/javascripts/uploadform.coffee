@@ -4,10 +4,12 @@ root = exports ? this
 $(document).ready -> $('#upload').submit validateForm
 
 $('#file').change -> validateFile()
-
 $('#url').blur -> validateUrlWithAjax(this)
-
 $('#url').keyup -> validateUrlWithAjax(this)
+$('#password').focus -> cleanValidation $('span[id^=validatePassword]')
+$('#password2').focus -> cleanValidation $('#validatePassword2')
+$('#question').focus -> cleanValidation $('#validateQuestion')
+$('#answer').focus -> cleanValidation $('#validateAnswer')
 
 # Validators
 validateFile = ->
@@ -66,6 +68,12 @@ validatePassword = ->
       setError($('#validatePassword')) 'Enter password'
     else
       setSuccess $('#validatePassword')
+      unless $('#password2').val()?.length
+        setError($('#validatePassword2')) 'Retype password'
+      else if $('#password').val() isnt $("#password2").val()
+        setError($('#validatePassword2')) 'Mismatch'
+      else
+        setSuccess $('#validatePassword2')
   else true
 
 validateQuestion = ->
@@ -91,8 +99,8 @@ root.validateForm = ->
 # Bootstrap tab switching
 $('a[data-toggle="tab"]').on 'show', (e) ->
   if endsWith(e.relatedTarget.href, '1')
-    cleanValidation $('#validatePassword')
-    $('#password').val ''
+    cleanValidation $('span[id^=validatePassword]')
+    $('input[id^=password]').val ''
     $('#choice').val 'question'
   else
     $('#choice').val 'password'
