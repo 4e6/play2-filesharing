@@ -19,7 +19,7 @@ object Global extends GlobalSettings {
 
     transaction {
       try {
-        models.Files.create
+        models.Storage.create
       } catch {
         case e @ (_: Exception | _: RuntimeException) =>
       }

@@ -52,7 +52,7 @@ object Helpers {
 
   def getSomeFile(url: String) = {
     import org.squeryl.PrimitiveTypeMode._
-    transaction(models.Files.files lookup url)
+    transaction(models.Storage.files lookup url)
   }
 
   implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)

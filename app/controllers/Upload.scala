@@ -8,8 +8,7 @@ import play.api.mvc._
 import MultipartFormData.FilePart
 
 import Helpers._
-import models.File
-import models.Files._
+import models._
 
 trait Upload {
   self: Controller =>
@@ -29,7 +28,7 @@ trait Upload {
 
     def success(f: File) = {
       import org.squeryl.PrimitiveTypeMode._
-      transaction(files insert f)
+      transaction(Storage.files insert f)
       Ok("Success(" + f.name + ")")
     }
 
@@ -48,22 +47,19 @@ trait Upload {
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
     val file = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
-      import libs.Files.copyFile
-      import Play.current
+      import scalax.file.Path
 
       val FilePart(_, name, _, ref) = fp
-      val path = "files/" + u + "/" + name
-      val dest = Play.getFile(path)
+      val dest = Storage.path(u, name)
 
-      copyFile(ref.file, dest)
+      Path(ref.file) copyTo Path(dest)
       ref.clean
 
       c match {
-        case "password" => new File(u, name, path, now.timestamp, to.timestamp, Some(p), None, None)
-        case "question" => new File(u, name, path, now.timestamp, to.timestamp, None, Some(q), Some(a))
+        case "password" => new File(u, name, dest, now.timestamp, to.timestamp, Some(p), None, None)
+        case "question" => new File(u, name, dest, now.timestamp, to.timestamp, None, Some(q), Some(a))
       }
 
-      //new File(u, name, path, now.timestamp, to.timestamp, Some(p), Some(q), Some(a))
     }
 
     file.fold(failure, success)

@@ -28,8 +28,11 @@ class File(val url: String,
   def id = url
 }
 
-object Files extends Schema {
+object Storage extends Schema {
   val files = table[File]("FILES")
+  
+  def path(url: String, name: String) = 
+    "/mnt/storage/webcb/files/" + url + "/" + name
 
   on(files) { f =>
     declare(
