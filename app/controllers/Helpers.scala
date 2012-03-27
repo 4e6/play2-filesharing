@@ -14,8 +14,8 @@ object Helpers {
 
     /* Returns milliseconds */
     def sec = num.times(n, num.fromInt(1000))
-    def min = num.times(sec, num.fromInt(60))
-    def hour = num.times(min, num.fromInt(60))
+    def mins = num.times(sec, num.fromInt(60))
+    def hour = num.times(mins, num.fromInt(60))
     def hours = hour
     def day = num.times(hour, num.fromInt(24))
     def days = day
@@ -28,6 +28,10 @@ object Helpers {
     def timestamp = new java.sql.Timestamp(num.toLong(n))
   }
 
+  implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
+
+  val bytePrefixes = Seq("B", "kB", "MB", "GB")
+
   def hash(salt: Long)(password: String): Array[Byte] = {
     val digest = java.security.MessageDigest.getInstance("SHA-256")
     digest.reset()
@@ -36,12 +40,7 @@ object Helpers {
   }
 
   def verifyData(file: models.File, key: String, data: String) = {
-    // to models.file ->
-    val info = key match {
-      case "password" => file.password
-      case "answer" => file.answer
-    }
-    info getOrElse Array.empty sameElements hash(file.creationTime.getTime)(data)
+    file.getSecret(key) getOrElse Array.empty sameElements hash(file.creationTime.getTime)(data)
   }
 
   def multipartParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
@@ -54,6 +53,4 @@ object Helpers {
     import org.squeryl.PrimitiveTypeMode._
     transaction(models.Storage.files lookup url)
   }
-
-  implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
 }

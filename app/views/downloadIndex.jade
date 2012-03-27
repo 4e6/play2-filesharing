@@ -1,5 +1,6 @@
 -@ val url: String
 -@ val filename: String
+-@ val filesize: String
 -@ val password: Boolean = false
 -@ val question: String = ""
 - attributes("title") = "Download file"
@@ -7,6 +8,7 @@
   .page-header
     h2 You are trying to download
     code= filename
+    code= filesize
   #form
     - if (password) 
       .control-group

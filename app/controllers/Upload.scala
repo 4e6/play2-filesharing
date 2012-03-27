@@ -50,14 +50,15 @@ trait Upload {
       import scalax.file.Path
 
       val FilePart(_, name, _, ref) = fp
+      val size = ref.file.length
       val dest = Storage.path(u, name)
 
       Path(ref.file) copyTo Path(dest)
       ref.clean
 
       c match {
-        case "password" => new File(u, name, dest, now.timestamp, to.timestamp, Some(p), None, None)
-        case "question" => new File(u, name, dest, now.timestamp, to.timestamp, None, Some(q), Some(a))
+        case "password" => new File(u, name, size, dest, now.timestamp, to.timestamp, Some(p), None, None)
+        case "question" => new File(u, name, size, dest, now.timestamp, to.timestamp, None, Some(q), Some(a))
       }
 
     }

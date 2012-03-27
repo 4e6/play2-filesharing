@@ -20,6 +20,7 @@ trait Download {
       val params = Map(
         "url" -> url,
         "filename" -> f.name,
+        "filesize" -> f.readableSize,
         "password" -> f.password.isDefined,
         "question" -> f.question.getOrElse(""))
 
@@ -57,4 +58,3 @@ trait Download {
     Ok(toJson(JsObject(Seq("correct" -> JsBoolean(isCorrect | false)))))
   }
 }
-
