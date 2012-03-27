@@ -1,8 +1,5 @@
 resolvers ++= Seq(
   DefaultMavenRepository,
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots",
-  Resolver.file("Local Play20 Repository", file("/opt/git-repos/play20/repository/local"))(Resolver.ivyStylePatterns)
-)
+  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
 
-addSbtPlugin("play" % "sbt-plugin" % "2.1-SNAPSHOT")
+addSbtPlugin("play" % "sbt-plugin" % "2.0")

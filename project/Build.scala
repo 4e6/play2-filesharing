@@ -17,8 +17,7 @@ object ApplicationBuild extends Build {
 
   val appResolvers = Seq(
     DefaultMavenRepository,
-    "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-    Resolver.file("Local Play20 Repository", file("/opt/git-repos/play20/repository/local"))(Resolver.ivyStylePatterns))
+    "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
 
   val appSettings = Seq(
     resolvers ++= appResolvers,
@@ -26,7 +25,6 @@ object ApplicationBuild extends Build {
     javaOptions in run += "-Xmx2G -XX:MaxPermSize=512m",
     ensimeConfig := sexp(
       key(":formatting-prefs"), sexp(
-        //key(":preserveDanglingCloseParenthesis"), true,
         key(":alignParameters"), true,
         key(":doubleIndentClassDeclaration"), true
       )
