@@ -9,6 +9,8 @@
       .control-group
         span http://localhost/
         input#url(type="text" name="url" placeholder="Annual report.docx")
+        span#loader(style="display: none;")
+          img(src={routes.Assets.at("images/ajax-loader.gif")})
         span#validateUrl.help-inline
       .tabbable
         ul.nav.nav-tabs

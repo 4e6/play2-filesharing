@@ -32,11 +32,13 @@ validateUrl = ->
 validateUrlWithAjax = (u) ->
   unless validateUrl()
     clearTimeout u.timer if u.timer?
+    $('#loader').hide()
     return u.lastValue = u.value
 
   if u.value isnt u.lastValue
     clearTimeout u.timer if u.timer?
-    cleanValidation $('#validateUrl'), '<img src="/assets/images/ajax-loader.gif" /> checking availability...'
+    cleanValidation $('#validateUrl'), "checking availability..."
+    $('#loader').show()
 
     u.timer = setTimeout(
       -> $.ajax
@@ -45,6 +47,7 @@ validateUrlWithAjax = (u) ->
         data:
           'url': $.trim u.value
         dataType: 'json'
+        complete: -> $('#loader').hide()
         success: (j) ->
           if j.available
             setSuccess $('#validateUrl')
