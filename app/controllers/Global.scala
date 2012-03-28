@@ -25,6 +25,12 @@ object Global extends GlobalSettings {
       }
     }
 
+    workers.Scheduler.start()
+
     Logger.info("Application configured")
+  }
+
+  override def onStop(app: Application) {
+    workers.Scheduler.stop()
   }
 }
