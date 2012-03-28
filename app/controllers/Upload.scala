@@ -26,14 +26,18 @@ trait Upload {
 
     def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
 
-    def success(f: File) = {
+    def success(t: (File, Task)) = {
       import org.squeryl.PrimitiveTypeMode._
-      transaction(Storage.files insert f)
-      Ok("Success(" + f.name + ")")
+      val (file, task) = t
+      transaction {
+        Storage.files insert file
+        Storage.schedule insert task
+      }
+      Ok("Success(" + file.name + ")")
     }
 
     lazy val now = System.currentTimeMillis
-    lazy val to = now + 1.day
+    lazy val to = now + 1.mins
 
     val url = multipartParam("url") flatMap valid flatMap available
     val password = multipartParam("password") map hash(now)
@@ -46,7 +50,7 @@ trait Upload {
 
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
-    val file = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
+    val result = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
       import scalax.file.Path
 
       val FilePart(_, name, _, ref) = fp
@@ -56,14 +60,16 @@ trait Upload {
       Path(ref.file) copyTo Path(dest)
       ref.clean
 
-      c match {
+      val file = c match {
         case "password" => new File(u, name, size, dest, now.timestamp, to.timestamp, Some(p), None, None)
         case "question" => new File(u, name, size, dest, now.timestamp, to.timestamp, None, Some(q), Some(a))
       }
 
+      val task = new Task(u, to.timestamp)
+      (file, task)
     }
 
-    file.fold(failure, success)
+    result.fold(failure, success)
   }
 
   def checkUrl = Action(parse.urlFormEncoded) { implicit request =>

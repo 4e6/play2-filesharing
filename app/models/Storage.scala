@@ -47,8 +47,16 @@ class File(val url: String,
   }
 }
 
+class Task(val url: String,
+           val deletionTime: Timestamp)
+    extends KeyedEntity[String] {
+
+  def id = url
+}
+
 object Storage extends Schema {
   val files = table[File]("FILES")
+  val schedule = table[Task]("SCHEDULE")
 
   def path(url: String, name: String) =
     "/mnt/storage/webcb/files/" + url + "/" + name
