@@ -32,8 +32,10 @@ trait Download {
 
   def retrieveFile(url: String, key: String, data: String) = {
     def success(f: models.File) = Action {
+      import scalax.file.Path
+      import scalax.file.defaultfs.DefaultPath
       Ok.sendFile(
-        content = new java.io.File(f.path),
+        content = f.path.asInstanceOf[DefaultPath].jfile,
         fileName = _ => f.name)
     }
     def failure = Action {

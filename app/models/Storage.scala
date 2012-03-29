@@ -8,7 +8,6 @@ import controllers.Helpers._
 class File(val url: String,
            val name: String,
            val size: Long,
-           val path: String,
            val creationTime: Timestamp,
            val deletionTime: Timestamp,
            val password: Option[Array[Byte]],
@@ -20,7 +19,6 @@ class File(val url: String,
     "url",
     "name",
     0,
-    "path",
     0 timestamp,
     0 timestamp,
     Some(Array.empty),
@@ -28,6 +26,8 @@ class File(val url: String,
     Some(Array.empty))
 
   def id = url
+
+  def path = Storage.root / url / name
 
   def getSecret(key: String) = key match {
     case "password" => password
@@ -55,17 +55,16 @@ class Task(val url: String,
 }
 
 object Storage extends Schema {
+  import scalax.file.Path
+
   val files = table[File]("FILES")
   val schedule = table[Task]("SCHEDULE")
-
-  def path(url: String, name: String) =
-    "/mnt/storage/webcb/files/" + url + "/" + name
+  val root = Path("/mnt/storage/webcb/files")
 
   on(files) { f =>
     declare(
       f.url is (unique, indexed, dbType("varchar(255)")),
       f.name is (dbType("varchar(255)")),
-      f.path is (dbType("varchar(255)")),
       f.question is (dbType("varchar(255)")),
       f.password is (dbType("binary(32)")),
       f.answer is (dbType("binary(32)")))

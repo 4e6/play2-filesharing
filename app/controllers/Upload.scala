@@ -51,18 +51,17 @@ trait Upload {
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
     val result = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
-      import scalax.file.Path
 
       val FilePart(_, name, _, ref) = fp
       val size = ref.file.length
-      val dest = Storage.path(u, name)
+      val dest = Storage.root / u / name
 
-      Path(ref.file) copyTo Path(dest)
+      scalax.file.Path(ref.file) copyTo dest
       ref.clean
 
       val file = c match {
-        case "password" => new File(u, name, size, dest, now.timestamp, to.timestamp, Some(p), None, None)
-        case "question" => new File(u, name, size, dest, now.timestamp, to.timestamp, None, Some(q), Some(a))
+        case "password" => new File(u, name, size, now.timestamp, to.timestamp, Some(p), None, None)
+        case "question" => new File(u, name, size, now.timestamp, to.timestamp, None, Some(q), Some(a))
       }
 
       val task = new Task(u, to.timestamp)

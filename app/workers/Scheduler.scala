@@ -18,7 +18,6 @@ object Scheduler {
     Logger.info("Running scheduled job")
 
     def now = System.currentTimeMillis.timestamp
-    def storageRoot = Path("/mnt/storage/webcb/files")
 
     val urls = transaction {
       from(Storage.schedule) { task =>
@@ -28,24 +27,16 @@ object Scheduler {
     }
 
     if (transaction(urls.nonEmpty)) {
-      val files = transaction {
-        from(Storage.files) { file =>
-          where(file.url in urls)
-          select(file)
-        }
-      }
-
-      val deletedFiles = transaction {
-        files filter { file =>
-          val dir = Path(file.path).parent.get
-          assert(dir.parent.get == storageRoot)
+      val deletedUrls = transaction {
+        urls filter { url =>
+          val dir = Storage.root / url
+          assert(dir.parent.get == Storage.root)
           Logger.info("Deleting: " + dir)
           val (deleted, remains) = dir.deleteRecursively()
           Logger.info("Deletion stats[" + deleted + "," + remains + "]")
           remains == 0
         }
       }
-      val deletedUrls = deletedFiles.map(_.url)
 
       transaction(Storage.files deleteWhere { f => f.url in deletedUrls })
       transaction(Storage.schedule deleteWhere { t => t.url in deletedUrls })
