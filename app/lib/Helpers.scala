@@ -1,12 +1,13 @@
-package controllers
+package lib
 
 import scalaz._
 import Scalaz._
 
-import play.api._
 import play.api.mvc._
-import java.sql.Timestamp
+
+import akka.util.Duration
 import akka.util.duration._
+import java.sql.Timestamp
 
 object Helpers {
   class NumericPimp[A: Numeric](val n: A) {
@@ -22,11 +23,11 @@ object Helpers {
 
   implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
 
-  implicit def durationToTimestamp(d: akka.util.Duration) = new Timestamp(d.toMillis)
+  implicit def durationToTimestamp(d: Duration) = new Timestamp(d.toMillis)
 
   val bytePrefixes = Seq("B", "kB", "MB", "GB")
 
-  def timeNow = System.currentTimeMillis millis
+  def timeNow: Duration = System.currentTimeMillis.millis
 
   def hash(salt: Long)(password: String): Array[Byte] = {
     val digest = java.security.MessageDigest.getInstance("SHA-256")

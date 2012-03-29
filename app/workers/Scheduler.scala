@@ -5,14 +5,15 @@ import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import akka.util.duration._
 
+import models._
+import lib.Helpers._
+
 object Scheduler {
 
   lazy val scheduledTask =
     Akka.system.scheduler.schedule(1 second, 1 minute) { job }
 
   def job() {
-    import models._
-    import controllers.Helpers._
     import org.squeryl.PrimitiveTypeMode._
     Logger.info("Running scheduled job")
 

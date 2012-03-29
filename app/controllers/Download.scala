@@ -6,7 +6,8 @@ import Scalaz._
 import play.api._
 import play.api.mvc._
 
-import Helpers._
+import models._
+import lib.Helpers._
 
 trait Download {
   self: Controller with ScalateEngine =>
@@ -16,7 +17,7 @@ trait Download {
       render("views/fileNotFound.jade", "filename" -> url)
     }
 
-    def success(f: models.File) = {
+    def success(f: File) = {
       val params = Map(
         "url" -> url,
         "filename" -> f.name,
@@ -31,7 +32,7 @@ trait Download {
   }
 
   def retrieveFile(url: String, key: String, data: String) = {
-    def success(f: models.File) = Action {
+    def success(f: File) = Action {
       import scalax.file.Path
       import scalax.file.defaultfs.DefaultPath
       Ok.sendFile(

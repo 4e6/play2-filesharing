@@ -5,7 +5,7 @@ import org.squeryl.PrimitiveTypeMode._
 
 object Storage extends Schema {
 
-  val root = scalax.file.Path(Config.storagePath)
+  val root = scalax.file.Path(lib.Config.storagePath)
 
   val files = table[File]("FILES")
   val schedule = table[Task]("SCHEDULE")

@@ -3,7 +3,7 @@ import play.api.db.DB
 import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.adapters.H2Adapter
-import models.Config._
+import lib.Config._
 
 object Global extends GlobalSettings {
 

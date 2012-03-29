@@ -8,8 +8,8 @@ import play.api.mvc._
 import MultipartFormData.FilePart
 import akka.util.duration._
 
-import Helpers._
 import models._
+import lib.Helpers._
 
 trait Upload {
   self: Controller =>
@@ -52,11 +52,12 @@ trait Upload {
     val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
 
     val result = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
-
       val FilePart(_, name, _, ref) = fp
       val size = ref.file.length
       val dest = Storage.root / u / name
 
+      /* Workaround for scala-io 'moveTo bug
+       * https://github.com/jesseeichar/scala-io/issues/54*/
       scalax.file.Path(ref.file) copyTo dest
       ref.clean
 

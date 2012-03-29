@@ -3,7 +3,8 @@ package models
 import org.squeryl.KeyedEntity
 import java.sql.Timestamp
 import akka.util.duration._
-import controllers.Helpers._
+
+import lib.Helpers._
 
 class File(val url: String,
            val name: String,
