@@ -1,12 +1,11 @@
 import play.api._
-import play.api.db._
+import play.api.db.DB
 import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.adapters.H2Adapter
+import models.Config._
 
 object Global extends GlobalSettings {
-  def logStatements_?(implicit app: Application) =
-    app.configuration.getBoolean("db.dev.logStatements") getOrElse false
 
   override def onStart(app: Application) {
     implicit val a = app
