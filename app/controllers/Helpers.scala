@@ -5,6 +5,8 @@ import Scalaz._
 
 import play.api._
 import play.api.mvc._
+import java.sql.Timestamp
+import akka.util.duration._
 
 object Helpers {
   class NumericPimp[A: Numeric](val n: A) {
@@ -12,25 +14,19 @@ object Helpers {
     private[this] lazy val num = implicitly[Numeric[A]]
     private[this] lazy val kibi = num.fromInt(1024)
 
-    /* Returns milliseconds */
-    def sec = num.times(n, num.fromInt(1000))
-    def mins = num.times(sec, num.fromInt(60))
-    def hour = num.times(mins, num.fromInt(60))
-    def hours = hour
-    def day = num.times(hour, num.fromInt(24))
-    def days = day
-
     /* Returns bytes */
     def kB = num.times(n, kibi)
     def MB = num.times(kB, kibi)
     def GB = num.times(MB, kibi)
-
-    def timestamp = new java.sql.Timestamp(num.toLong(n))
   }
 
   implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
 
+  implicit def durationToTimestamp(d: akka.util.Duration) = new Timestamp(d.toMillis)
+
   val bytePrefixes = Seq("B", "kB", "MB", "GB")
+
+  def timeNow = System.currentTimeMillis millis
 
   def hash(salt: Long)(password: String): Array[Byte] = {
     val digest = java.security.MessageDigest.getInstance("SHA-256")

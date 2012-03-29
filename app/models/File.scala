@@ -2,6 +2,7 @@ package models
 
 import org.squeryl.KeyedEntity
 import java.sql.Timestamp
+import akka.util.duration._
 import controllers.Helpers._
 
 class File(val url: String,
@@ -18,8 +19,8 @@ class File(val url: String,
     "url",
     "name",
     0,
-    0 timestamp,
-    0 timestamp,
+    0 millis,
+    0 millis,
     Some(Array.empty),
     Some("question"),
     Some(Array.empty))

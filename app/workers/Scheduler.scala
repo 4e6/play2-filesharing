@@ -16,7 +16,7 @@ object Scheduler {
     import org.squeryl.PrimitiveTypeMode._
     Logger.info("Running scheduled job")
 
-    def now = System.currentTimeMillis.timestamp
+    val now: java.sql.Timestamp = timeNow
 
     val urls = transaction {
       from(Storage.schedule) { task =>

@@ -6,6 +6,7 @@ import Scalaz._
 import play.api._
 import play.api.mvc._
 import MultipartFormData.FilePart
+import akka.util.duration._
 
 import Helpers._
 import models._
@@ -36,13 +37,13 @@ trait Upload {
       Ok("Success(" + file.name + ")")
     }
 
-    lazy val now = System.currentTimeMillis
-    lazy val to = now + 1.mins
+    lazy val now = timeNow
+    lazy val to = now + 1.minute
 
     val url = multipartParam("url") flatMap valid flatMap available
-    val password = multipartParam("password") map hash(now)
+    val password = multipartParam("password") map hash(now.toMillis)
     val question = multipartParam("question")
-    val answer = multipartParam("answer") map hash(now)
+    val answer = multipartParam("answer") map hash(now.toMillis)
     val choice = multipartParam("choice") flatMap {
       case c @ ("password" | "question") => c.successNel
       case _ => "invalid choice".failNel
@@ -60,11 +61,11 @@ trait Upload {
       ref.clean
 
       val file = c match {
-        case "password" => new File(u, name, size, now.timestamp, to.timestamp, Some(p), None, None)
-        case "question" => new File(u, name, size, now.timestamp, to.timestamp, None, Some(q), Some(a))
+        case "password" => new File(u, name, size, now, to, Some(p), None, None)
+        case "question" => new File(u, name, size, now, to, None, Some(q), Some(a))
       }
 
-      val task = new Task(u, to.timestamp)
+      val task = new Task(u, to)
       (file, task)
     }
 
