@@ -55,6 +55,7 @@ validateUrlWithAjax = (u) ->
             setSuccess $('#validateUrl')
           else
             setError $('#validateUrl'), 'reserved'
+        error: (j, msg, error)-> setError $('#validateUrl'), msg
       1200
     )
     u.lastValue = u.value

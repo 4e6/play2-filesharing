@@ -6,7 +6,7 @@ root.check = (key) ->
   url = $('#url').val()
   data = $.trim $("##{key}").val()
   $.ajax
-    url: '__checkData'
+    url: '__checkSecret'
     type: 'post'
     data:
       'url': url

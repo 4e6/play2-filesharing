@@ -73,6 +73,7 @@ trait Upload {
     result.fold(failure, success)
   }
 
+  /** Check url availability*/
   def checkUrl = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._

@@ -31,6 +31,7 @@ trait Download {
     getSomeFile(url).fold(success, failure)
   }
 
+  /** Send file to user*/
   def retrieveFile(url: String, key: String, data: String) = {
     def success(f: File) = Action {
       import scalax.file.Path
@@ -48,7 +49,8 @@ trait Download {
     file.cata(success, failure)
   }
 
-  def checkData = Action(parse.urlFormEncoded) { implicit request =>
+  /** Check password or answer*/
+  def checkSecret = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._
 
