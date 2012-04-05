@@ -28,12 +28,11 @@
               span#validatePassword2
           #2.tab-pane
             p.control-group
-              input#question(type="text" name="question" placeholder="Your question")
+              input#question(type="text" name="question" placeholder="Your question" disabled)
               span#validateQuestion
             p.control-group
-              input#answer(type="text" name="answer" placeholder="Answer")
+              input#answer(type="text" name="answer" placeholder="Answer" disabled)
               span#validateAnswer
-      input#choice(type="hidden" name="choice" value="password")
       div
         button.btn.btn-primary(type="submit") Upload
   script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})

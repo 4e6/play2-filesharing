@@ -99,9 +99,14 @@ root.validateForm = ->
 
 # Bootstrap tab switching
 $('a[data-toggle="tab"]').on 'show', (e) ->
+  passwords = $('input[id^=password]')
+  passwordsHint = $('span[id^=validatePassword]')
+  qa = $("#question,#answer")
   if endsWith(e.relatedTarget.href, '1')
-    cleanValidation $('span[id^=validatePassword]')
-    $('input[id^=password]').val ''
-    $('#choice').val 'question'
+    cleanValidation passwordsHint
+    passwords.val ''
+    passwords.attr 'disabled', 'disabled'
+    qa.removeAttr 'disabled'
   else
-    $('#choice').val 'password'
+    qa.attr 'disabled', 'disabled'
+    passwords.removeAttr 'disabled'

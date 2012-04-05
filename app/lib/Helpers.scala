@@ -25,6 +25,8 @@ object Helpers {
 
   implicit def durationToTimestamp(d: Duration) = new Timestamp(d.toMillis)
 
+  implicit def durationToLong(d: Duration) = d.toMillis
+
   val bytePrefixes = Seq("B", "kB", "MB", "GB")
 
   def timeNow: Duration = System.currentTimeMillis.millis
@@ -36,18 +38,18 @@ object Helpers {
     digest.digest(password.getBytes("UTF-8"))
   }
 
-  def verifyData(file: models.File, key: String, data: String) = {
+  def verifyData(file: models.Record, key: String, data: String) = {
     file.getSecret(key) getOrElse Array.empty sameElements hash(file.creationTime.getTime)(data)
   }
 
   def multipartParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
-    request.body.dataParts.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
+    request.body.asFormUrlEncoded.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
 
   def urlParam(key: String)(implicit request: Request[Map[String, Seq[String]]]) =
     request.body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
 
   def getSomeFile(url: String) = {
     import org.squeryl.PrimitiveTypeMode._
-    transaction(models.Storage.files lookup url)
+    transaction(models.Storage.records lookup url)
   }
 }

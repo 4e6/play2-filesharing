@@ -17,7 +17,7 @@ trait Download {
       render("views/fileNotFound.jade", "filename" -> url)
     }
 
-    def success(f: File) = {
+    def success(f: Record) = {
       val params = Map(
         "url" -> url,
         "filename" -> f.name,
@@ -33,7 +33,7 @@ trait Download {
 
   /** Send file to user*/
   def retrieveFile(url: String, key: String, data: String) = {
-    def success(f: File) = Action {
+    def success(f: Record) = Action {
       import scalax.file.Path
       import scalax.file.defaultfs.DefaultPath
       Ok.sendFile(

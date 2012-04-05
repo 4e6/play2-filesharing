@@ -36,7 +36,7 @@ object Scheduler {
       }
     }
 
-    transaction(Storage.files deleteWhere { _.url in deletedUrls })
+    transaction(Storage.records deleteWhere { _.url in deletedUrls })
     transaction(Storage.schedule deleteWhere { _.url in deletedUrls })
 
   }

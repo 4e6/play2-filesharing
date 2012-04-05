@@ -5,6 +5,7 @@ GET      /                      controllers.Application.index()
 POST     /                      controllers.Application.uploadFile()
 
 # API
+POST     /post                  controllers.Application.apiUpload()
 POST     /checkUrl              controllers.Application.checkUrl()
 POST     /__checkSecret         controllers.Application.checkSecret()
 

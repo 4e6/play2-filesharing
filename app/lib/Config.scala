@@ -8,4 +8,5 @@ object Config {
 
   lazy val logStatements_? = config.getBoolean("db.dev.logStatements") | false
   lazy val storagePath = config.getString("storage.path") | "files"
+  lazy val storageTime = akka.util.Duration(15, "minutes")
 }

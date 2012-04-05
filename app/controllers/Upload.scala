@@ -14,6 +14,28 @@ import lib.Helpers._
 trait Upload {
   self: Controller =>
 
+  def apiUpload = Action(parse.multipartFormData) { implicit request =>
+    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+
+    def success(record: Record) = {
+      import org.squeryl.PrimitiveTypeMode._
+      transaction(Storage.records insert record)
+      Ok("Success(" + record.name + ")")
+    }
+
+    lazy val now = timeNow
+
+    val file = Record.File.apply
+    val url = Record.URL(file)
+    val password = Record.Password(now)
+    val question = Record.Question.apply
+    val answer = Record.Answer(now)
+
+    val result = Record(file, url, password, question, answer, now)
+
+    result.fold(failure, success)
+  }
+
   def valid(url: String) =
     if (url matches """^[^\s?&]+[^?&]*$""") url.successNel
     else "invalid url".failNel
@@ -27,11 +49,11 @@ trait Upload {
 
     def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
 
-    def success(t: (File, Task)) = {
+    def success(t: (Record, Task)) = {
       import org.squeryl.PrimitiveTypeMode._
       val (file, task) = t
       transaction {
-        Storage.files insert file
+        Storage.records insert file
         Storage.schedule insert task
       }
       Ok("Success(" + file.name + ")")
@@ -62,8 +84,8 @@ trait Upload {
       ref.clean
 
       val file = c match {
-        case "password" => new File(u, name, size, now, to, Some(p), None, None)
-        case "question" => new File(u, name, size, now, to, None, Some(q), Some(a))
+        case "password" => new Record(u, name, size, now, to, Some(p), None, None)
+        case "question" => new Record(u, name, size, now, to, None, Some(q), Some(a))
       }
 
       val task = new Task(u, to)
