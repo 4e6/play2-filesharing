@@ -30,6 +30,8 @@ class Record(val url: String,
 
   def path = Storage.root / url / name
 
+  def file = path.asInstanceOf[scalax.file.defaultfs.DefaultPath].jfile
+
   def getSecret(key: String) = key match {
     case "password" => password
     case "answer" => answer
@@ -58,11 +60,13 @@ object Record {
 
   import akka.util.Duration
 
-  type R = Request[MultipartFormData[TemporaryFile]]
+  type V[X] = ValidationNEL[String, X]
 
   object File {
-    def apply(implicit request: R) =
-      request.body.file("file").toSuccess("file not found").liftFailNel
+    def apply(implicit r: Request[MultipartFormData[TemporaryFile]]) =
+      r.body.file("file").toSuccess("file not found").liftFailNel
+
+    def get[T](url: String) = getFile(url)
   }
 
   object URL {
@@ -73,8 +77,8 @@ object Record {
     def available(url: String) =
       getSomeFile(url).cata(_ => "url reserved".failNel, url.successNel)
 
-    def apply(file: ValidationNEL[String, FilePart[_]])(implicit request: R) = {
-      val url = (multipartParam("url"), file) match {
+    def apply[T: Request](file: ValidationNEL[String, FilePart[_]]) = {
+      val url = (getParam("url"), file) match {
         case (Success(u), _) => Success(u)
         case (_, Success(f)) => Success(f.filename)
         case (_, Failure(e)) => e.fail
@@ -85,27 +89,40 @@ object Record {
   }
 
   object Question {
-    def apply(implicit request: R) = multipartParam("question")
+    def apply[T: Request] = getParam("question")
   }
 
   sealed trait Secret
 
   case object Password extends Secret {
-    def apply(time: Long)(implicit request: R) = multipartParam("password") map hash(time)
+    def apply[T: Request](time: Long) = getParam("password") map hash(time)
+
+    def get[T: Request] = getParam("password")
+
+    def verify(r: Record, p: String) =
+      if (r.password | Array.empty sameElements hash(r.creationTime.getTime)(p))
+        r.successNel
+      else
+        "incorrect password".failNel
   }
 
   case object Answer {
-    def apply(time: Long)(implicit request: R) = multipartParam("answer") map hash(time)
+    def apply[T: Request](time: Long) = getParam("answer") map hash(time)
+
+    def get[T: Request] = getParam("answer")
+
+    def verify(r: Record, a: String) =
+      if (r.answer | Array.empty sameElements hash(r.creationTime.getTime)(a))
+        r.successNel
+      else
+        "incorrect answer".failNel
   }
 
-  type V[X] = ValidationNEL[String, X]
-
   object Secret {
-    def apply(password: V[Array[Byte]], answer: V[Array[Byte]]) =
-      (password, answer) match {
-        case (Failure(_), Success(a)) => Answer
-        case _ => Password
-      }
+    def apply(password: V[_], answer: V[_]) = (password, answer) match {
+      case (Failure(_), Success(a)) => Answer
+      case _ => Password
+    }
   }
 
   private[this] def prepare(file: FilePart[TemporaryFile], url: String) = {
@@ -141,4 +158,12 @@ object Record {
     }
   }
 
+  def get(
+    record: V[Record],
+    password: V[String],
+    answer: V[String]) =
+    Secret(password, answer) match {
+      case Password => (record <|*|> password) flatMap { Password.verify _ tupled }
+      case Answer => (record <|*|> answer) flatMap { Answer.verify _ tupled }
+    }
 }

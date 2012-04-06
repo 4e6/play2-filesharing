@@ -4,6 +4,7 @@ import scalaz._
 import Scalaz._
 
 import play.api.mvc._
+import play.api.libs.Files.TemporaryFile
 
 import akka.util.Duration
 import akka.util.duration._
@@ -42,14 +43,23 @@ object Helpers {
     file.getSecret(key) getOrElse Array.empty sameElements hash(file.creationTime.getTime)(data)
   }
 
-  def multipartParam(key: String)(implicit request: Request[MultipartFormData[_]]) =
-    request.body.asFormUrlEncoded.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
-
-  def urlParam(key: String)(implicit request: Request[Map[String, Seq[String]]]) =
-    request.body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
+  def getParam[T](key: String)(implicit request: Request[T]) = {
+    val body = request.body match {
+      case body: MultipartFormData[_] => body.asFormUrlEncoded
+      case body: AnyContent => body.asFormUrlEncoded | Map.empty
+      case body: Map[String, Seq[String]] => body
+    }
+    body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
+  }
 
   def getSomeFile(url: String) = {
     import org.squeryl.PrimitiveTypeMode._
     transaction(models.Storage.records lookup url)
+  }
+
+  def getFile(url: String) = {
+    import org.squeryl.PrimitiveTypeMode._
+    transaction(models.Storage.records lookup url)
+      .toSuccess("file " + url + " not found").liftFailNel
   }
 }

@@ -31,10 +31,28 @@ trait Download {
     getSomeFile(url).fold(success, failure)
   }
 
+  def apiDownload(url: String) = Action(parse.urlFormEncoded) { implicit request =>
+    def success(r: Record) =
+      Ok.sendFile(
+        content = r.file,
+        fileName = _ => r.name)
+
+    def failure(l: NonEmptyList[String]) = Ok("Fail" + l.list)
+
+    Logger.debug("apiDownload body[" + request.body + "]")
+
+    val file = Record.File.get(url)
+    val pass = Record.Password.get
+    val answer = Record.Answer.get
+
+    val record = Record.get(file, pass, answer)
+
+    record.fold(failure, success)
+  }
+
   /** Send file to user*/
   def retrieveFile(url: String, key: String, data: String) = {
     def success(f: Record) = Action {
-      import scalax.file.Path
       import scalax.file.defaultfs.DefaultPath
       Ok.sendFile(
         content = f.path.asInstanceOf[DefaultPath].jfile,
@@ -54,9 +72,9 @@ trait Download {
     import play.api.libs.json._
     import Json._
 
-    val file = urlParam("url").toOption flatMap getSomeFile
-    val key = urlParam("key").toOption
-    val data = urlParam("data").toOption
+    val file = getParam("url").toOption flatMap getSomeFile
+    val key = getParam("key").toOption
+    val data = getParam("data").toOption
 
     val isCorrect = (file |@| key |@| data) { verifyData }
 

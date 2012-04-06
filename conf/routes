@@ -6,6 +6,7 @@ POST     /                      controllers.Application.uploadFile()
 
 # API
 POST     /post                  controllers.Application.apiUpload()
+POST     /get/*url              controllers.Application.apiDownload(url)
 POST     /checkUrl              controllers.Application.checkUrl()
 POST     /__checkSecret         controllers.Application.checkSecret()
 

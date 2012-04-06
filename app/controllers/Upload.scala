@@ -62,11 +62,11 @@ trait Upload {
     lazy val now = timeNow
     lazy val to = now + 1.minute
 
-    val url = multipartParam("url") flatMap valid flatMap available
-    val password = multipartParam("password") map hash(now.toMillis)
-    val question = multipartParam("question")
-    val answer = multipartParam("answer") map hash(now.toMillis)
-    val choice = multipartParam("choice") flatMap {
+    val url = getParam("url") flatMap valid flatMap available
+    val password = getParam("password") map hash(now.toMillis)
+    val question = getParam("question")
+    val answer = getParam("answer") map hash(now.toMillis)
+    val choice = getParam("choice") flatMap {
       case c @ ("password" | "question") => c.successNel
       case _ => "invalid choice".failNel
     }
@@ -106,7 +106,7 @@ trait Upload {
 
     def success(f: String) = "available"
 
-    val file = urlParam("url") flatMap available
+    val file = getParam("url") flatMap available
 
     val msg = file.fold(failure, success)
 
