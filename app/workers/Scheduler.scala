@@ -21,7 +21,7 @@ object Scheduler {
 
     val urls = transaction {
       from(Storage.schedule) { task =>
-        where(task.deletionTime <= now)
+        where(task.deletionTime lte now)
         select(task.url)
       }
     }

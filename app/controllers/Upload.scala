@@ -32,29 +32,25 @@ trait Upload {
     result.fold(failure, success)
   }
 
-  def apiUpload = Action(parse.multipartFormData) { implicit request =>
-    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+  def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
 
-    def success(r: Record) = {
-      import org.squeryl.PrimitiveTypeMode._
-      transaction(Storage.records insert r)
-      Ok("Success(" + r.name + ")")
+  def success(record: Record) = {
+    import org.squeryl.PrimitiveTypeMode._
+    val task = new Task(record.url, record.deletionTime)
+    transaction {
+      Storage.records insert record
+      Storage.schedule insert task
     }
+    Ok("Success(" + record.name + ")")
+  }
 
+  def apiUpload = Action(parse.multipartFormData) { implicit request =>
     Logger.debug("apiUpload body[" + request.body + "]")
 
     Result(failure, success)
   }
 
   def uploadFile = Action(parse.multipartFormData) { implicit request =>
-    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
-
-    def success(r: Record) = {
-      import org.squeryl.PrimitiveTypeMode._
-      transaction(Storage.records insert r)
-      Ok("Success(" + r.name + ")")
-    }
-
     Logger.debug("uploadFile body[" + request.body + "]")
 
     Result(failure, success)

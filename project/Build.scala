@@ -27,7 +27,7 @@ object ApplicationBuild extends Build {
       key(":formatting-prefs"), sexp(
         key(":preserveDanglingCloseParenthesis"), true,
         key(":alignParameters"), true,
-        key(":doubleIndentClassDeclaration"), true
+        key(":doubleIndentClassDeclaration"), false
       )
     )
   )

@@ -14,7 +14,7 @@ class Record(val url: String,
              val password: Option[Array[Byte]],
              val question: Option[String],
              val answer: Option[Array[Byte]])
-    extends KeyedEntity[String] {
+  extends KeyedEntity[String] {
 
   def this() = this(
     "url",
