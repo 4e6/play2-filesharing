@@ -86,6 +86,8 @@ object Record {
 
       url flatMap valid flatMap available
     }
+
+    def get[T: Request] = getParam("url") flatMap valid flatMap available
   }
 
   object Question {

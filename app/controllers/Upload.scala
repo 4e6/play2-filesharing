@@ -6,6 +6,7 @@ import Scalaz._
 import play.api._
 import play.api.mvc._
 import MultipartFormData.FilePart
+import play.api.libs.Files.TemporaryFile
 import akka.util.duration._
 
 import models._
@@ -14,15 +15,10 @@ import lib.Helpers._
 trait Upload {
   self: Controller =>
 
-  def apiUpload = Action(parse.multipartFormData) { implicit request =>
-    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
-
-    def success(record: Record) = {
-      import org.squeryl.PrimitiveTypeMode._
-      transaction(Storage.records insert record)
-      Ok("Success(" + record.name + ")")
-    }
-
+  def Result[T](
+    failure: NonEmptyList[String] => SimpleResult[T],
+    success: Record => SimpleResult[T])(
+      implicit r: Request[MultipartFormData[TemporaryFile]]) = {
     lazy val now = timeNow
 
     val file = Record.File.apply
@@ -36,63 +32,32 @@ trait Upload {
     result.fold(failure, success)
   }
 
-  def valid(url: String) =
-    if (url matches """^[^\s?&]+[^?&]*$""") url.successNel
-    else "invalid url".failNel
-
-  def available(url: String) =
-    getSomeFile(url).cata(_ => "reserved".failNel, url.successNel)
-
-  def uploadFile = Action(parse.multipartFormData) { implicit request =>
-    Logger.debug("Start file uploading...")
-    Logger.debug("body[" + request.body + "]")
-
+  def apiUpload = Action(parse.multipartFormData) { implicit request =>
     def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
 
-    def success(t: (Record, Task)) = {
+    def success(r: Record) = {
       import org.squeryl.PrimitiveTypeMode._
-      val (file, task) = t
-      transaction {
-        Storage.records insert file
-        Storage.schedule insert task
-      }
-      Ok("Success(" + file.name + ")")
+      transaction(Storage.records insert r)
+      Ok("Success(" + r.name + ")")
     }
 
-    lazy val now = timeNow
-    lazy val to = now + 1.minute
+    Logger.debug("apiUpload body[" + request.body + "]")
 
-    val url = getParam("url") flatMap valid flatMap available
-    val password = getParam("password") map hash(now.toMillis)
-    val question = getParam("question")
-    val answer = getParam("answer") map hash(now.toMillis)
-    val choice = getParam("choice") flatMap {
-      case c @ ("password" | "question") => c.successNel
-      case _ => "invalid choice".failNel
+    Result(failure, success)
+  }
+
+  def uploadFile = Action(parse.multipartFormData) { implicit request =>
+    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+
+    def success(r: Record) = {
+      import org.squeryl.PrimitiveTypeMode._
+      transaction(Storage.records insert r)
+      Ok("Success(" + r.name + ")")
     }
 
-    val filepart = request.body.files.headOption.toSuccess("file").liftFailNel
+    Logger.debug("uploadFile body[" + request.body + "]")
 
-    val result = (filepart |@| url |@| password |@| question |@| answer |@| choice) { (fp, u, p, q, a, c) =>
-      val FilePart(_, name, _, ref) = fp
-      val size = ref.file.length
-      val dest = Storage.root / u / name
-
-      /* Workaround for scala-io 'moveTo bug
-       * https://github.com/jesseeichar/scala-io/issues/54*/
-      scalax.file.Path(ref.file) copyTo dest
-      ref.clean
-
-      val file = c match {
-        case "password" => new Record(u, name, size, now, to, Some(p), None, None)
-        case "question" => new Record(u, name, size, now, to, None, Some(q), Some(a))
-      }
-
-      val task = new Task(u, to)
-      (file, task)
-    }
-
-    result.fold(failure, success)
+    Result(failure, success)
   }
 
   /** Check url availability*/
@@ -100,16 +65,16 @@ trait Upload {
     import play.api.libs.json._
     import Json._
 
-    Logger.debug("checkUrl request body[" + request.body + "]")
-
     def failure(l: NonEmptyList[String]) = l.list mkString ", "
 
     def success(f: String) = "available"
 
-    val file = getParam("url") flatMap available
+    Logger.debug("checkUrl request body[" + request.body + "]")
 
-    val msg = file.fold(failure, success)
+    val url = Record.URL.get
 
-    Ok(toJson(JsObject(Seq("available" -> JsBoolean(file.isSuccess), "msg" -> JsString(msg)))))
+    val msg = url.fold(failure, success)
+
+    Ok(toJson(JsObject(Seq("available" -> JsBoolean(url.isSuccess), "msg" -> JsString(msg)))))
   }
 }

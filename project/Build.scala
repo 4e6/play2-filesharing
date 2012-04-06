@@ -25,6 +25,7 @@ object ApplicationBuild extends Build {
     javaOptions in run += "-Xmx2G -XX:MaxPermSize=512m",
     ensimeConfig := sexp(
       key(":formatting-prefs"), sexp(
+        key(":preserveDanglingCloseParenthesis"), true,
         key(":alignParameters"), true,
         key(":doubleIndentClassDeclaration"), true
       )
