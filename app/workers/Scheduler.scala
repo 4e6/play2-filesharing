@@ -20,10 +20,10 @@ object Scheduler {
     val now: java.sql.Timestamp = timeNow
 
     val urls = transaction {
-      from(Storage.schedule) { task =>
+      from(Storage.schedule)(task =>
         where(task.deletionTime lte now)
         select(task.url)
-      }
+      )
     }
 
     val deletedUrls = transaction {

@@ -140,13 +140,12 @@ object Record {
     name -> size
   }
 
-  def apply(
-    file: V[FilePart[TemporaryFile]],
-    url: V[String],
-    password: V[Array[Byte]],
-    question: V[String],
-    answer: V[Array[Byte]],
-    from: Duration) = {
+  def apply(file: V[FilePart[TemporaryFile]],
+            url: V[String],
+            password: V[Array[Byte]],
+            question: V[String],
+            answer: V[Array[Byte]],
+            from: Duration) = {
     val to = from + lib.Config.storageTime
     Secret(password, answer) match {
       case Password => (file |@| url |@| password) { (f, u, p) =>
@@ -160,10 +159,9 @@ object Record {
     }
   }
 
-  def get(
-    record: V[Record],
-    password: V[String],
-    answer: V[String]) =
+  def get(record: V[Record],
+          password: V[String],
+          answer: V[String]) =
     Secret(password, answer) match {
       case Password => (record <|*|> password) flatMap { Password.verify _ tupled }
       case Answer => (record <|*|> answer) flatMap { Answer.verify _ tupled }
