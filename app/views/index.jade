@@ -1,6 +1,6 @@
 - attributes("title") = "Index title"
 - layout("layouts/main.jade")
-  form#upload(action={routes.Application.uploadFile} method="post" enctype="multipart/form-data")
+  form#upload(action={routes.Application.apiUpload} method="post" enctype="multipart/form-data")
     fieldset
       legend Upload file
       .control-group

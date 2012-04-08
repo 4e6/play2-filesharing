@@ -49,12 +49,6 @@ trait Upload {
     Result(failure, success)
   }
 
-  def uploadFile = Action(parse.multipartFormData) { implicit request =>
-    Logger.debug("uploadFile body[" + request.body + "]")
-
-    Result(failure, success)
-  }
-
   /** Check url availability*/
   def checkUrl = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._

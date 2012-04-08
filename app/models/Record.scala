@@ -34,7 +34,7 @@ class Record(val url: String,
   def readableSize = {
     val mask = "%.1f"
     def convert(size: Double, px: Seq[String]): String = {
-      val next = size / 1.kB
+      val next = size / 1024
       if (px.nonEmpty && next > 1) convert(next, px.tail)
       else mask.format(size) + " " + px.head
     }

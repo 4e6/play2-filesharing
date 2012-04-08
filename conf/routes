@@ -1,6 +1,7 @@
 # Routes
 
 # Public API
+POST     /                      controllers.Application.apiUpload()
 POST     /post                  controllers.Application.apiUpload()
 POST     /get                   controllers.Application.apiGetMultipart()
 GET      /get                   controllers.Application.apiGet()
@@ -14,5 +15,4 @@ GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
 # Web pages
 GET      /                      controllers.Application.index()
-POST     /                      controllers.Application.uploadFile()
 GET      /*url                  controllers.Application.downloadIndex(url)
