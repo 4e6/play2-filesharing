@@ -7,7 +7,6 @@ import play.api._
 import play.api.mvc._
 import MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
-import akka.util.duration._
 
 import models._
 import lib.Helpers._

@@ -1,4 +1,6 @@
 -@ val filename: String
-- attributes("title") = "Fail"
+- attributes("title") = "Not found"
 - layout("layouts/main.jade")
-  #legend File [#{filename}] not found.
+  .page-header
+    h2 File not found.
+    code= filename

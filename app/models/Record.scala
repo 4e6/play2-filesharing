@@ -2,7 +2,6 @@ package models
 
 import org.squeryl.KeyedEntity
 import java.sql.Timestamp
-import akka.util.duration._
 
 import lib.Helpers._
 
@@ -20,8 +19,8 @@ class Record(val url: String,
     "url",
     "name",
     0,
-    0 millis,
-    0 millis,
+    0,
+    0,
     Some(Array.empty),
     Some("question"),
     Some(Array.empty))
@@ -48,6 +47,16 @@ class Record(val url: String,
 
     convert(size, bytePrefixes)
   }
+
+  def timeLeft = {
+    import akka.util.duration._
+    val millisLeft = deletionTime.getTime - timeNow
+    val minutes = millisLeft.toMinutes - millisLeft.toHours.hours.toMinutes
+    val hours = millisLeft.toHours - millisLeft.toDays.days.toHours
+    val days = millisLeft.toDays
+
+    minutes :: hours :: days :: Nil
+  }
 }
 
 object Record {
@@ -57,8 +66,6 @@ object Record {
   import play.api.mvc._
   import MultipartFormData.FilePart
   import play.api.libs.Files.TemporaryFile
-
-  import akka.util.Duration
 
   type V[X] = ValidationNEL[String, X]
 
@@ -75,7 +82,7 @@ object Record {
       else "invalid url".failNel
 
     def available(url: String) =
-      getSomeFile(url).cata(_ => "url reserved".failNel, url.successNel)
+      getFile(url).toOption.cata(_ => "url reserved".failNel, url.successNel)
 
     def apply[T: Request](file: ValidationNEL[String, FilePart[_]]) = {
       val url = (getParam("url"), file) match {
@@ -145,7 +152,7 @@ object Record {
             password: V[Array[Byte]],
             question: V[String],
             answer: V[Array[Byte]],
-            from: Duration) = {
+            from: Long) = {
     val to = from + lib.Config.storageTime
     Secret(password, answer) match {
       case Password => (file |@| url |@| password) { (f, u, p) =>

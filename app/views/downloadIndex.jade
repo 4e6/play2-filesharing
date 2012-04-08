@@ -1,16 +1,18 @@
 -@ val url: String
 -@ val filename: String
 -@ val filesize: String
--@ val password: Boolean = false
--@ val question: String = ""
+-@ val deletionTime: String
+-@ val hasPassword: Boolean
+-@ val question: String
 - attributes("title") = "Download file"
 - layout("layouts/main.jade")
   .page-header
     h2 You are trying to download
     code= filename
     code= filesize
+    code= deletionTime
   #form
-    - if (password) 
+    - if (hasPassword)
       .control-group
         h4 This file is password protected:
         input#password(type="password" name="password" placeholder="Password")

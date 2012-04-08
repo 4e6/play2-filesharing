@@ -24,13 +24,13 @@ object Helpers {
 
   implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
 
-  implicit def durationToTimestamp(d: Duration) = new Timestamp(d.toMillis)
+  implicit def longToTimestamp(l: Long) = new Timestamp(l)
 
-  implicit def durationToLong(d: Duration) = d.toMillis
+  implicit def longToDuration(l: Long) = l.millis
+
+  def timeNow = System.currentTimeMillis
 
   val bytePrefixes = Seq("B", "kB", "MB", "GB")
-
-  def timeNow: Duration = System.currentTimeMillis.millis
 
   def hash(salt: Long)(password: String): Array[Byte] = {
     val digest = java.security.MessageDigest.getInstance("SHA-256")
