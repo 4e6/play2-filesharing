@@ -57,15 +57,20 @@ object Record {
   import scalaz.{ Logger => _, _ }
   import Scalaz._
 
+  import play.api.http.HeaderNames.CONTENT_LENGTH
   import play.api.mvc._
   import MultipartFormData.FilePart
   import play.api.libs.Files.TemporaryFile
+  import lib.Config
 
   type V[X] = ValidationNEL[String, X]
 
   object File {
     def apply(implicit r: Request[MultipartFormData[TemporaryFile]]) =
-      r.body.file("file").toSuccess("file not found").liftFailNel
+      if (r.headers.get(CONTENT_LENGTH).map(_.toLong < Config.filesizeLimit) | false)
+        r.body.file("file").toSuccess("file not found").liftFailNel
+      else
+        "file is too large".failNel
   }
 
   object URL {
