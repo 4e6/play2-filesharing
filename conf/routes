@@ -2,8 +2,8 @@
 
 # Public API
 POST     /post                  controllers.Application.apiUpload()
-POST     /get                   controllers.Application.apiGet()
-GET      /__retrieve            controllers.Application.retrieveFile(url, key, data)
+POST     /get                   controllers.Application.apiGetMultipart()
+GET      /get                   controllers.Application.apiGet()
 
 # Private API
 POST     /checkUrl              controllers.Application.checkUrl()

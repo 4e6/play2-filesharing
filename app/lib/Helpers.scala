@@ -46,7 +46,7 @@ object Helpers {
   def getParam[T](key: String)(implicit request: Request[T]) = {
     val body = request.body match {
       case body: MultipartFormData[_] => body.asFormUrlEncoded
-      case body: AnyContent => body.asFormUrlEncoded | Map.empty
+      case body: AnyContent => request.queryString
       case body: Map[String, Seq[String]] => body
     }
     body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel

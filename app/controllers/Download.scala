@@ -40,38 +40,27 @@ trait Download {
     Record.get(url).fold(failure, success)
   }
 
-  def apiGet = Action(parse.multipartFormData) { implicit request =>
-    def success(r: Record) = Ok.sendFile(
-      content = r.file,
-      fileName = _ => r.name)
-
-    def failure(l: NonEmptyList[String]) = Ok("Fail" + l.list)
-
-    Logger.debug("apiGet body[" + request.body + "]")
-
-    val url = Record.URL.get
-    val record = url flatMap { Record.get }
-    val pass = Record.Password.get
-    val answer = Record.Answer.get
-
-    Record.verify(record, pass, answer).fold(failure, success)
-  }
-
-  /** Send file to user*/
-  def retrieveFile(url: String, key: String, data: String) = {
-    def success(r: Record) = Action {
-      Ok.sendFile(
+  def GetAction[A](bp: BodyParser[A] = parse.anyContent): Action[A] =
+    Action(bp) { implicit request =>
+      def success(r: Record) = Ok.sendFile(
         content = r.file,
         fileName = _ => r.name)
-    }
-    def failure = Action {
-      Ok { render("views/fileNotFound.jade", "filename" -> url) }
+
+      def failure(l: NonEmptyList[String]) = Ok("Fail" + l.list)
+
+      Logger.debug("apiGet body[" + request.body + "]")
+
+      val url = Record.URL.get
+      val record = url flatMap { Record.get }
+      val pass = Record.Password.get
+      val answer = Record.Answer.get
+
+      Record.verify(record, pass, answer).fold(failure, success)
     }
 
-    val file = getSomeFile(url) filter { verifyData(_, key, data) }
+  def apiGetMultipart = GetAction(parse.multipartFormData)
 
-    file.cata(success, failure)
-  }
+  def apiGet = GetAction()
 
   /** Check password or answer*/
   def checkSecret = Action(parse.urlFormEncoded) { implicit request =>

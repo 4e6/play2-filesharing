@@ -28,4 +28,4 @@ root.check = (key) ->
     error: (j) -> $('#hint').html j
 
 getFile = (url, key, data) ->
-  $('#holder').attr "src", "__retrieve?url=#{url}&key=#{key}&data=#{data}"
+  $('#holder').attr "src", "get?url=#{url}&#{key}=#{data}"
