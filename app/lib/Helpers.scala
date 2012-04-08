@@ -39,10 +39,6 @@ object Helpers {
     digest.digest(password.getBytes("UTF-8"))
   }
 
-  def verifyData(file: models.Record, key: String, data: String) = {
-    file.getSecret(key) getOrElse Array.empty sameElements hash(file.creationTime.getTime)(data)
-  }
-
   def getParam[T](key: String)(implicit request: Request[T]) = {
     val body = request.body match {
       case body: MultipartFormData[_] => body.asFormUrlEncoded
@@ -50,11 +46,6 @@ object Helpers {
       case body: Map[String, Seq[String]] => body
     }
     body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
-  }
-
-  def getSomeFile(url: String) = {
-    import org.squeryl.PrimitiveTypeMode._
-    transaction(models.Storage.records lookup url)
   }
 
 }

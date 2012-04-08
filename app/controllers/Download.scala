@@ -50,8 +50,7 @@ trait Download {
 
       Logger.debug("apiGet body[" + request.body + "]")
 
-      val url = Record.URL.get
-      val record = url flatMap { Record.get }
+      val record = Record.get
       val pass = Record.Password.get
       val answer = Record.Answer.get
 
@@ -67,12 +66,12 @@ trait Download {
     import play.api.libs.json._
     import Json._
 
-    val file = getParam("url").toOption flatMap getSomeFile
-    val key = getParam("key").toOption
-    val data = getParam("data").toOption
+    val record = Record.get
+    val pass = Record.Password.get
+    val answer = Record.Answer.get
 
-    val isCorrect = (file |@| key |@| data) { verifyData }
+    val isCorrect = Record.verify(record, pass, answer).isSuccess
 
-    Ok(toJson(JsObject(Seq("correct" -> JsBoolean(isCorrect | false)))))
+    Ok(toJson(JsObject(Seq("correct" -> JsBoolean(isCorrect)))))
   }
 }

@@ -7,7 +7,7 @@ GET      /get                   controllers.Application.apiGet()
 
 # Private API
 POST     /checkUrl              controllers.Application.checkUrl()
-POST     /__checkSecret         controllers.Application.checkSecret()
+POST     /checkSecret           controllers.Application.checkSecret()
 
 # Static resources
 GET      /assets/*file          controllers.Assets.at(path="/public", file)

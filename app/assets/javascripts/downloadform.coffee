@@ -6,12 +6,9 @@ root.check = (key) ->
   url = $('#url').val()
   data = $.trim $("##{key}").val()
   $.ajax
-    url: '__checkSecret'
+    url: 'checkSecret'
     type: 'post'
-    data:
-      'url': url
-      'key': key
-      'data': data
+    data: "url=#{url}&#{key}=#{data}"
     dataType: 'json'
     beforeSend: ->
       cleanValidation $()

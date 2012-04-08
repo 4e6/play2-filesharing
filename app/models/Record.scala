@@ -31,12 +31,6 @@ class Record(val url: String,
 
   def file = path.asInstanceOf[scalax.file.defaultfs.DefaultPath].jfile
 
-  def getSecret(key: String) = key match {
-    case "password" => password
-    case "answer" => answer
-    case _ => None
-  }
-
   def readableSize = {
     val mask = "%.1f"
     def convert(size: Double, px: Seq[String]): String = {
@@ -82,7 +76,7 @@ object Record {
     def available(url: String) =
       Record.get(url).toOption.cata(_ => "url reserved".failNel, url.successNel)
 
-    def apply[T: Request](file: ValidationNEL[String, FilePart[_]]) = {
+    def apply[T: Request](file: V[FilePart[_]]) = {
       val url = (getParam("url"), file) match {
         case (Success(u), _) => Success(u)
         case (_, Success(f)) => Success(f.filename)
@@ -166,11 +160,13 @@ object Record {
     }
   }
 
-  def get[T](url: String) = {
+  def get(url: String): V[Record] = {
     import org.squeryl.PrimitiveTypeMode._
     transaction(models.Storage.records lookup url)
       .toSuccess("file " + url + " not found").liftFailNel
   }
+
+  def get[T: Request]: V[Record] = URL.get flatMap Record.get
 
   def verify(record: V[Record],
              password: V[String],
