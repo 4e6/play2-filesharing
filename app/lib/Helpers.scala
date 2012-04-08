@@ -57,9 +57,4 @@ object Helpers {
     transaction(models.Storage.records lookup url)
   }
 
-  def getFile(url: String) = {
-    import org.squeryl.PrimitiveTypeMode._
-    transaction(models.Storage.records lookup url)
-      .toSuccess("file " + url + " not found").liftFailNel
-  }
 }

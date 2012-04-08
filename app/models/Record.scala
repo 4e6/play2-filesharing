@@ -72,8 +72,6 @@ object Record {
   object File {
     def apply(implicit r: Request[MultipartFormData[TemporaryFile]]) =
       r.body.file("file").toSuccess("file not found").liftFailNel
-
-    def get[T](url: String) = getFile(url)
   }
 
   object URL {
@@ -82,7 +80,7 @@ object Record {
       else "invalid url".failNel
 
     def available(url: String) =
-      getFile(url).toOption.cata(_ => "url reserved".failNel, url.successNel)
+      Record.get(url).toOption.cata(_ => "url reserved".failNel, url.successNel)
 
     def apply[T: Request](file: ValidationNEL[String, FilePart[_]]) = {
       val url = (getParam("url"), file) match {
@@ -91,10 +89,12 @@ object Record {
         case (_, Failure(e)) => e.fail
       }
 
-      url flatMap valid flatMap available
+      url flatMap available
     }
 
-    def get[T: Request] = getParam("url") flatMap valid flatMap available
+    def apply[T: Request] = getParam("url") flatMap available
+
+    def get[T: Request] = getParam("url")
   }
 
   object Question {
@@ -166,9 +166,15 @@ object Record {
     }
   }
 
-  def get(record: V[Record],
-          password: V[String],
-          answer: V[String]) =
+  def get[T](url: String) = {
+    import org.squeryl.PrimitiveTypeMode._
+    transaction(models.Storage.records lookup url)
+      .toSuccess("file " + url + " not found").liftFailNel
+  }
+
+  def verify(record: V[Record],
+             password: V[String],
+             answer: V[String]) =
     Secret(password, answer) match {
       case Password => (record <|*|> password) flatMap { Password.verify _ tupled }
       case Answer => (record <|*|> answer) flatMap { Answer.verify _ tupled }

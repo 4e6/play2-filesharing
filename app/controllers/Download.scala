@@ -37,35 +37,32 @@ trait Download {
       Ok { render("views/downloadIndex.jade", params) }
     }
 
-    getFile(url).fold(failure, success)
+    Record.get(url).fold(failure, success)
   }
 
-  def apiDownload(url: String) = Action(parse.urlFormEncoded) { implicit request =>
-    def success(r: Record) =
-      Ok.sendFile(
-        content = r.file,
-        fileName = _ => r.name)
+  def apiGet = Action(parse.multipartFormData) { implicit request =>
+    def success(r: Record) = Ok.sendFile(
+      content = r.file,
+      fileName = _ => r.name)
 
     def failure(l: NonEmptyList[String]) = Ok("Fail" + l.list)
 
-    Logger.debug("apiDownload body[" + request.body + "]")
+    Logger.debug("apiGet body[" + request.body + "]")
 
-    val file = Record.File.get(url)
+    val url = Record.URL.get
+    val record = url flatMap { Record.get }
     val pass = Record.Password.get
     val answer = Record.Answer.get
 
-    val record = Record.get(file, pass, answer)
-
-    record.fold(failure, success)
+    Record.verify(record, pass, answer).fold(failure, success)
   }
 
   /** Send file to user*/
   def retrieveFile(url: String, key: String, data: String) = {
-    def success(f: Record) = Action {
-      import scalax.file.defaultfs.DefaultPath
+    def success(r: Record) = Action {
       Ok.sendFile(
-        content = f.path.asInstanceOf[DefaultPath].jfile,
-        fileName = _ => f.name)
+        content = r.file,
+        fileName = _ => r.name)
     }
     def failure = Action {
       Ok { render("views/fileNotFound.jade", "filename" -> url) }

@@ -66,7 +66,7 @@ trait Upload {
 
     Logger.debug("checkUrl request body[" + request.body + "]")
 
-    val url = Record.URL.get
+    val url = Record.URL.apply
 
     val msg = url.fold(failure, success)
 

@@ -1,18 +1,18 @@
 # Routes
 
-# Home page
-GET      /                      controllers.Application.index()
-POST     /                      controllers.Application.uploadFile()
-
-# API
+# Public API
 POST     /post                  controllers.Application.apiUpload()
-POST     /get/*url              controllers.Application.apiDownload(url)
+POST     /get                   controllers.Application.apiGet()
+GET      /__retrieve            controllers.Application.retrieveFile(url, key, data)
+
+# Private API
 POST     /checkUrl              controllers.Application.checkUrl()
 POST     /__checkSecret         controllers.Application.checkSecret()
 
 # Static resources
 GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
-# Downloading
-GET      /__retrieve            controllers.Application.retrieveFile(url, key, data)
+# Web pages
+GET      /                      controllers.Application.index()
+POST     /                      controllers.Application.uploadFile()
 GET      /*url                  controllers.Application.downloadIndex(url)
