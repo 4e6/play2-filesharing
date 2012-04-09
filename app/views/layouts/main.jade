@@ -1,5 +1,6 @@
 -@ val body: String
 -@ val title: String = "Default Title"
+-@ val menu: Set[String] = Set.empty
 
 !!!
 html(lang="en")
@@ -24,10 +25,24 @@ html(lang="en")
           a.brand(href="/") Web Clipboard
           .nav-collapse
             ul.nav
-              li.active
-                a(href="#") Home
-              li
-                a(href="#about") About
+              - if (menu contains "Home")
+                li.active
+                  a(href="/") Home
+              - else
+                li
+                  a(href="/") Home
+              - if (menu contains "Search")
+                li.active
+                  a(href="/search") Search
+              - else
+                li
+                  a(href="/search") Search
+              - if (menu contains "About")
+                li.active
+                  a(href="/about") About
+              - else
+                li
+                  a(href="/about") About
     .container-fluid
       .row-fluid
         .span2 &nbsp
