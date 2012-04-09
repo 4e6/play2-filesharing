@@ -5,13 +5,13 @@
       legend Upload file
       .control-group
         input#file.input-file(type="file" name="file")
-        span#validateFile.help-inline
+        span#file-hint.help-inline
       .control-group
         span http://localhost/
         input#url(type="text" name="url" placeholder="Annual report.docx")
         span#loader(style="display: none;")
           img(src={routes.Assets.at("images/ajax-loader.gif")})
-        span#validateUrl.help-inline
+        span#url-hint.help-inline
       .tabbable
         ul.nav.nav-tabs
           li.active
@@ -22,17 +22,17 @@
           #1.tab-pane.active
             p.control-group
               input#password(type="password" name="password" placeholder="Password")
-              span#validatePassword
+              span#password-hint.help-inline
             p.control-group
               input#password2(type="password" placeholder="Retype password")
-              span#validatePassword2
+              span#password2-hint.help-inline
           #2.tab-pane
             p.control-group
               input#question(type="text" name="question" placeholder="Your question" disabled)
-              span#validateQuestion
+              span#question-hint.help-inline
             p.control-group
               input#answer(type="text" name="answer" placeholder="Answer" disabled)
-              span#validateAnswer
+              span#answer-hint.help-inline
       div
         button.btn.btn-primary(type="submit") Upload
   script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})

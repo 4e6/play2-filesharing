@@ -74,10 +74,6 @@ object Record {
   }
 
   object URL {
-    def valid(url: String) =
-      if (url matches """^[^\s?&]+[^?&]*$""") url.successNel
-      else "invalid url".failNel
-
     def available(url: String) =
       Record.get(url).toOption.cata(_ => "url reserved".failNel, url.successNel)
 

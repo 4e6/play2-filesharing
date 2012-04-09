@@ -10,8 +10,7 @@ import lib.Helpers._
 
 object Scheduler {
 
-  lazy val scheduledTask =
-    Akka.system.scheduler.schedule(1 second, 1 minute) { job }
+  lazy val scheduledTask = Akka.system.scheduler.schedule(1 second, 1 minute)(job)
 
   def job() {
     import org.squeryl.PrimitiveTypeMode._

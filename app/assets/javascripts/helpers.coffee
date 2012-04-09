@@ -8,6 +8,9 @@ root.setError = (elem, msg) ->
   elem.html msg
   false
 
+root.hasSuccess = (elem) ->
+  elem.parent().hasClass('success')
+
 root.setSuccess = (elem) ->
   elem.parent().removeClass('error').addClass('success')
   elem.html '✓'
