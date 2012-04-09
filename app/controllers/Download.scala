@@ -7,7 +7,6 @@ import play.api._
 import play.api.mvc._
 
 import models._
-import lib.Helpers._
 
 trait Download {
   self: Controller with ScalateEngine =>

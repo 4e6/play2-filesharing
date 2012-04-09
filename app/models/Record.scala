@@ -114,7 +114,7 @@ object Record {
         "incorrect password".failNel
   }
 
-  case object Answer {
+  case object Answer extends Secret {
     def apply[T: Request](time: Long) = getParam("answer") map hash(time)
 
     def get[T: Request] = getParam("answer")
