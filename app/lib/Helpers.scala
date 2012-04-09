@@ -12,14 +12,14 @@ import java.sql.Timestamp
 
 object Helpers {
   class NumericPimp[A: Numeric](val n: A) {
-    import Numeric._
     private[this] lazy val num = implicitly[Numeric[A]]
     private[this] lazy val kibi = num.fromInt(1024)
 
     /* Returns bytes */
-    def kB = num.times(n, kibi)
-    def MB = num.times(kB, kibi)
-    def GB = num.times(MB, kibi)
+    def K = num.times(n, kibi)
+    def M = num.times(K, kibi)
+    def G = num.times(M, kibi)
+    def T = num.times(G, kibi)
   }
 
   implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
