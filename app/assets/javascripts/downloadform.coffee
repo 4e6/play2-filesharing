@@ -2,6 +2,9 @@ root = exports ? this
 
 $('#password, #answer').focus -> cleanValidation $('#hint')
 
+$('input').keypress (e) ->
+  $('#download').trigger 'click' if e.which is 13
+
 root.check = (key) ->
   url = $('#url').val()
   data = $.trim $("##{key}").val()
@@ -20,6 +23,7 @@ root.check = (key) ->
         getFile(url, key, data)
         # window.location.replace("http://localhost:9000")
         $('#download').attr 'disabled', 'disabled'
+        $('input').attr 'disabled', 'disabled'
       else
         setError $('#hint'), "try again"
     error: (j) -> $('#hint').html j
