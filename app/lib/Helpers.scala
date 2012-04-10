@@ -22,7 +22,7 @@ object Helpers {
     def T = num.times(G, kibi)
   }
 
-  implicit def numPimp[A: Numeric](time: A) = new NumericPimp(time)
+  implicit def numericPimp[A: Numeric](n: A) = new NumericPimp(n)
 
   implicit def longToTimestamp(l: Long) = new Timestamp(l)
 
@@ -55,5 +55,16 @@ object Helpers {
 
     if (days == 0) "%02d:%02d".format(hours, minutes)
     else "%dd %02d:%02d".format(days, hours, minutes)
+  }
+
+  def readableSize(size: Long) = {
+    val mask = "%.1f"
+    def convert(size: Double, px: Seq[String]): String = {
+      val next = size / 1024
+      if (px.nonEmpty && next > 1) convert(next, px.tail)
+      else mask.format(size) + " " + px.head
+    }
+
+    convert(size, bytePrefixes)
   }
 }

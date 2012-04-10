@@ -31,17 +31,6 @@ class Record(val url: String,
 
   def file = path.asInstanceOf[scalax.file.defaultfs.DefaultPath].jfile
 
-  def readableSize = {
-    val mask = "%.1f"
-    def convert(size: Double, px: Seq[String]): String = {
-      val next = size / 1024
-      if (px.nonEmpty && next > 1) convert(next, px.tail)
-      else mask.format(size) + " " + px.head
-    }
-
-    convert(size, bytePrefixes)
-  }
-
   def timeLeft = deletionTime.getTime - timeNow
 }
 

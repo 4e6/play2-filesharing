@@ -16,11 +16,14 @@ hintOf = (elem) -> $("##{elem.attr 'id'}-hint")
 # Validators
 validateFile = ->
   file = $('#file')
+  sizeLimit = $('#filesize').val().match /\d+/
+  readableSize = $('#readableFilesize').val()
   hint = hintOf file
-  unless file.val()
+  unless file.val().length
     setError hint, 'Please choose a file'
-  else
-    setSuccess hint
+  else if file.get(0).files[0].size > sizeLimit
+    setError hint, "#{readableSize} limit"
+  else setSuccess hint
 
 validateUrl = ->
   url = $('#url')

@@ -21,7 +21,7 @@ trait Download {
       val params = Map(
         "url" -> url,
         "filename" -> r.name,
-        "filesize" -> r.readableSize,
+        "filesize" -> readableSize(r.size),
         "deletionTime" -> readableTime(r.timeLeft),
         "hasPassword" -> r.password.isDefined,
         "question" -> r.question.getOrElse(""))
