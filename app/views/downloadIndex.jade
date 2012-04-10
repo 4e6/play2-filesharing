@@ -7,15 +7,15 @@
 - attributes("title") = "Download file"
 - layout("layouts/main.jade")
   .page-header
-    h2 You are trying to download
+    h1(style="margin-bottom: 5px;") You are trying to download
     code= filename
     code= filesize
-    code= deletionTime
+    code  #{deletionTime} left
   #form
     - if (hasPassword)
       .control-group
-        h4 This file is password protected:
-        input#password(type="password" name="password" placeholder="Password")
+        h3 This file is password protected:
+        input#password(type="password" placeholder="Password")
         span#loader(style="display: none;")
           img(src={routes.Assets.at("images/ajax-loader.gif")})
         span#hint.help-inline
@@ -23,9 +23,9 @@
         button#download.btn.btn-primary(type="button" onclick="check('password')") Download
     - else
       .control-group
-        h4 Answer question first:
-        .alert.alert-info= question
-        input#answer(type="text" name="answer")
+        h3 Answer question first:
+        .well= question
+        input#answer(type="text" placeholder="Your answer")
         span#loader(style="display: none;")
           img(src={routes.Assets.at("images/ajax-loader.gif")})
         span#hint.help-inline
