@@ -42,15 +42,7 @@ class Record(val url: String,
     convert(size, bytePrefixes)
   }
 
-  def timeLeft = {
-    import akka.util.duration._
-    val millisLeft = deletionTime.getTime - timeNow
-    val minutes = millisLeft.toMinutes - millisLeft.toHours.hours.toMinutes
-    val hours = millisLeft.toHours - millisLeft.toDays.days.toHours
-    val days = millisLeft.toDays
-
-    minutes :: hours :: days :: Nil
-  }
+  def timeLeft = deletionTime.getTime - timeNow
 }
 
 object Record {

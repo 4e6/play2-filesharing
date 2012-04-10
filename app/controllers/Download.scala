@@ -7,19 +7,12 @@ import play.api._
 import play.api.mvc._
 
 import models._
+import lib.Helpers._
 
 trait Download {
   self: Controller with ScalateEngine =>
 
   def downloadIndex(url: String) = Action {
-    def timeLeftMsg(ts: List[Long]) = ts match {
-      case Nil => "Error"
-      case 0 :: _ => "in a minute"
-      case mins :: 0 :: _ => "%d minutes".format(mins)
-      case mins :: hours :: 0 :: _ => "%d hours %d minutes".format(hours, mins)
-      case mins :: hours :: days :: _ => "%d days".format(days)
-    }
-
     def failure(l: NonEmptyList[String]) = Ok {
       render("views/fileNotFound.jade", "filename" -> url)
     }
@@ -29,7 +22,7 @@ trait Download {
         "url" -> url,
         "filename" -> r.name,
         "filesize" -> r.readableSize,
-        "deletionTime" -> timeLeftMsg(r.timeLeft),
+        "deletionTime" -> readableTime(r.timeLeft),
         "hasPassword" -> r.password.isDefined,
         "question" -> r.question.getOrElse(""))
 

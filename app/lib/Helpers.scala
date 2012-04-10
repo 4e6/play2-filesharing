@@ -48,4 +48,16 @@ object Helpers {
     body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
   }
 
+  def readableTime(timeMillis: Long) = {
+    val minutes = timeMillis.toMinutes - timeMillis.toHours.hours.toMinutes
+    val hours = timeMillis.toHours - timeMillis.toDays.days.toHours
+    val days = timeMillis.toDays
+
+    (days, hours, minutes) match {
+      case (0, 0, 0) => "in a minute"
+      case (0, 0, _) => "%d minutes".format(minutes)
+      case (0, _, _) => "%d hours %d minutes".format(hours, minutes)
+      case _ => "%d days % hours %d minutes".format(days, hours, minutes)
+    }
+  }
 }

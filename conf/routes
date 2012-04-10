@@ -1,7 +1,7 @@
 # Routes
 
 # Public API
-POST     /                      controllers.Application.apiUpload()
+POST     /                      controllers.Application.webUpload()
 POST     /post                  controllers.Application.apiUpload()
 POST     /get                   controllers.Application.apiGetMultipart()
 GET      /get                   controllers.Application.apiGet()

@@ -12,41 +12,53 @@ import models._
 import lib.Helpers._
 
 trait Upload {
-  self: Controller =>
+  self: Controller with ScalateEngine =>
 
-  def Result[T](
-    failure: NonEmptyList[String] => SimpleResult[T],
-    success: Record => SimpleResult[T])(
-      implicit r: Request[MultipartFormData[TemporaryFile]]) = {
-    lazy val now = timeNow
+  type StringNEL = NonEmptyList[String]
 
-    val file = Record.File.apply
-    val url = Record.URL(file)
-    val password = Record.Password(now)
-    val question = Record.Question.apply
-    val answer = Record.Answer(now)
+  def Upload(onFailure: StringNEL => Result, onSuccess: Record => Result) =
+    Action(parse.multipartFormData) { implicit request =>
+      Logger.debug("Upload body[" + request.body + "]")
 
-    val result = Record(file, url, password, question, answer, now)
+      def success(record: Record) = {
+        import org.squeryl.PrimitiveTypeMode._
+        val task = new Task(record.url, record.deletionTime)
+        transaction {
+          Storage.records insert record
+          Storage.schedule insert task
+        }
+        onSuccess(record)
+      }
 
-    result.fold(failure, success)
-  }
+      lazy val now = timeNow
 
-  def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+      val file = Record.File.apply
+      val url = Record.URL(file)
+      val password = Record.Password(now)
+      val question = Record.Question.apply
+      val answer = Record.Answer(now)
 
-  def success(record: Record) = {
-    import org.squeryl.PrimitiveTypeMode._
-    val task = new Task(record.url, record.deletionTime)
-    transaction {
-      Storage.records insert record
-      Storage.schedule insert task
+      val result = Record(file, url, password, question, answer, now)
+
+      result.fold(onFailure, success)
     }
-    Ok("Success(" + record.name + ")")
+
+  def apiUpload = {
+    def failure(l: StringNEL) = Ok("Failure" + l.list)
+    def success(record: Record) = Ok("Success(" + record.name + ")")
+
+    Upload(failure, success)
   }
 
-  def apiUpload = Action(parse.multipartFormData) { implicit request =>
-    Logger.debug("apiUpload body[" + request.body + "]")
-
-    Result(failure, success)
+  def webUpload = {
+    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+    def success(r: Record) = Ok {
+      val params = Map(
+        "url" -> r.url,
+        "time" -> readableTime(r.timeLeft))
+      render("views/uploadSuccess.jade", params)
+    }
+    Upload(failure, success)
   }
 
   /** Check url availability*/

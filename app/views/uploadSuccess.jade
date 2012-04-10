@@ -1,0 +1,15 @@
+-@ val url: String
+-@ val time: String
+- attributes("title") = "Upload successful"
+- layout("layouts/main.jade")
+  .page-header
+    h1 Upload Successful
+  .content
+    h3
+      | File will be available by the links below for
+      code= time
+    .links-well
+      pre
+        code
+          | http://localhost:9000/#{url}
+          | curl -F url=#{url} -F password=YourPWD http://localhost:9000/get
