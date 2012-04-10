@@ -51,13 +51,16 @@ trait Upload {
   }
 
   def webUpload = {
-    def failure(l: NonEmptyList[String]) = Ok("Failure" + l.list)
+    def failure(l: StringNEL) = Ok {
+      render("views/uploadFailure.jade", "errors" -> l.list.mkString(", "))
+    }
     def success(r: Record) = Ok {
       val params = Map(
         "url" -> r.url,
         "time" -> readableTime(r.timeLeft))
       render("views/uploadSuccess.jade", params)
     }
+
     Upload(failure, success)
   }
 
