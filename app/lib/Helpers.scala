@@ -53,11 +53,7 @@ object Helpers {
     val hours = timeMillis.toHours - timeMillis.toDays.days.toHours
     val days = timeMillis.toDays
 
-    (days, hours, minutes) match {
-      case (0, 0, 0) => "in a minute"
-      case (0, 0, _) => "%d minutes".format(minutes)
-      case (0, _, _) => "%d hours %d minutes".format(hours, minutes)
-      case _ => "%d days % hours %d minutes".format(days, hours, minutes)
-    }
+    if (days == 0) "%02d:%02d".format(hours, minutes)
+    else "%dd %02d:%02d".format(days, hours, minutes)
   }
 }
