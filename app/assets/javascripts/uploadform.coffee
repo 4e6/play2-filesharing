@@ -1,15 +1,30 @@
 root = exports ? this
 
 # Event handlers
-$(document).ready -> $('#upload').submit validateForm
+$(document).ready ->
+  $('#upload').submit validateForm
 
-$('#file').change -> validateFile()
-$('#url').blur -> validateUrlWithAjax(this)
-$('#url').keyup -> validateUrlWithAjax(this)
-$('#password').focus -> cleanValidation $('span[id^=password]')
-$('#password2').focus -> cleanValidation $('#password2-hint')
-$('#question').focus -> cleanValidation $('#question-hint')
-$('#answer').focus -> cleanValidation $('#answer-hint')
+  $('#file').change -> validateFile()
+  $('#url').blur -> validateUrlWithAjax(this)
+  $('#url').keyup -> validateUrlWithAjax(this)
+  $('#password').focus -> cleanValidation $('span[id^=password]')
+  $('#password2').focus -> cleanValidation $('#password2-hint')
+  $('#question').focus -> cleanValidation $('#question-hint')
+  $('#answer').focus -> cleanValidation $('#answer-hint')
+
+  # Bootstrap tab switching
+  $('a[data-toggle="tab"]').on 'show', (e) ->
+    passwords = $('input[id^=password]')
+    passwordsHint = $('span[id^=password]')
+    qa = $("#question,#answer")
+    if endsWith(e.relatedTarget.href, '1')
+      cleanValidation passwordsHint
+      passwords.val ''
+      passwords.attr 'disabled', 'disabled'
+      qa.removeAttr 'disabled'
+    else
+      qa.attr 'disabled', 'disabled'
+      passwords.removeAttr 'disabled'
 
 hintOf = (elem) -> $("##{elem.attr 'id'}-hint")
 
@@ -108,17 +123,3 @@ validators = [validateFile, validateUrl, validatePassword, validateQuestion, val
 
 root.validateForm = ->
   validators.map((v) -> v()).every((r) -> r)
-
-# Bootstrap tab switching
-$('a[data-toggle="tab"]').on 'show', (e) ->
-  passwords = $('input[id^=password]')
-  passwordsHint = $('span[id^=password]')
-  qa = $("#question,#answer")
-  if endsWith(e.relatedTarget.href, '1')
-    cleanValidation passwordsHint
-    passwords.val ''
-    passwords.attr 'disabled', 'disabled'
-    qa.removeAttr 'disabled'
-  else
-    qa.attr 'disabled', 'disabled'
-    passwords.removeAttr 'disabled'

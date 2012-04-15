@@ -1,13 +1,15 @@
 -@ val records: Seq[Record] = Seq.empty
+-@ val resultsNumber: Int = 0
+-@ val query: String = ""
+-@ val page: Int = 1
+-@ val pages: Int = 1
 - attributes("title") = "Search"
 
 - captureAttribute("row")
   .row-fluid
     .span2 &nbsp
     .span8
-      - if (records.isEmpty)
-        p Nothing found
-      - else
+      - if (records.nonEmpty)
         table.table.table-striped
           thead
             tr
@@ -15,11 +17,13 @@
               th Name
               th Size
           tbody
-          - for (record <- records)
-            tr
-              td= record.url
-              td= record.name
-              td= record.size
+            - for (record <- records)
+              tr
+                td= record.url
+                td= record.name
+                td= record.size
+        .pagination.pagination-centered
+          = Application.pagination(page, pages, query)
     .span2 &nbsp
 
 - layout("layouts/main.jade")
@@ -27,3 +31,9 @@
     h1 Search
   form#search(action={routes.Application.search()} method="get")
     input#search(type="text" name="q" placeholder="What are you looking for?")
+  .summary
+    - if (query.nonEmpty)
+      - if (records.isEmpty)
+        p Nothing found for [#{query}]
+      - else
+        p Found #{resultsNumber} records for [#{query}]

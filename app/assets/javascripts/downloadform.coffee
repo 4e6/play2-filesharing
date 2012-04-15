@@ -1,9 +1,9 @@
 root = exports ? this
 
-$('#password, #answer').focus -> cleanValidation $('#hint')
-
-$('input').keypress (e) ->
-  $('#download').trigger 'click' if e.which is 13
+$(document).ready ->
+  $('#password, #answer').focus -> cleanValidation $('#hint')
+  $('input').keypress (e) ->
+    $('#download').trigger 'click' if e.which is 13
 
 root.check = (key) ->
   url = $('#url').val()
