@@ -1,6 +1,11 @@
 -@ val filesizeLimit: String
 -@ val readableFilesize: String
 - attributes("title") = "WebClipboard"
+
+- captureAttribute("head")
+  script(type="text/javascript" src={routes.Assets.at("javascripts/helpers.min.js")})
+  script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})
+
 - layout("layouts/main.jade")
   form#upload(action={routes.Application.webUpload} method="post" enctype="multipart/form-data")
     fieldset
@@ -39,4 +44,3 @@
         button.btn.btn-primary(type="submit") Upload
       input#filesize(type="hidden" value={filesizeLimit})
       input#readableFilesize(type="hidden" value={readableFilesize})
-  script(type="text/javascript" src={routes.Assets.at("javascripts/uploadform.min.js")})

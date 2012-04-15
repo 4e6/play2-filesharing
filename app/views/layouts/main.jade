@@ -1,4 +1,6 @@
+-@ val head: String = ""
 -@ val body: String
+-@ val row: String = ""
 -@ val title: String = "Default Title"
 -@ val menu: Set[String] = Set.empty
 
@@ -7,13 +9,12 @@ html(lang="en")
   head
     title= title
     meta(charset="utf-8")
+    link(rel="shortcut icon" type="image/png" href={routes.Assets.at("images/favicon.png")})
     link(rel="stylesheet" href={routes.Assets.at("stylesheets/bootstrap/bootstrap.min.css")})
     link(rel="stylesheet" href={routes.Assets.at("stylesheets/main.min.css")})
-    link(rel="shortcut icon" type="image/png" href={routes.Assets.at("images/favicon.png")})
     script(type="text/javascript" src={routes.Assets.at("javascripts/jquery-1.7.1.min.js")})
     script(type="text/javascript" src={routes.Assets.at("javascripts/bootstrap.min.js")})
-    script(type="text/javascript" src={routes.Assets.at("javascripts/helpers.min.js")})
-    -# script(type="text/javascript" src={routes.Assets.at("javascripts/jquery.noisy.min.js")})
+    != head
   body
     .navbar.navbar-fixed-top
       .navbar-inner
@@ -44,8 +45,6 @@ html(lang="en")
                 li
                   a(href="/about") About
     .container-fluid
-      .row-fluid
-        .span2 &nbsp
-        .span8.well
-          != body
-        .span2 &nbsp
+      - layout("row.jade")
+        != body
+      != row

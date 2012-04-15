@@ -21,6 +21,8 @@ object ApplicationBuild extends Build {
 
   val appSettings = Seq(
     resolvers ++= appResolvers,
+    watchSources <+= baseDirectory map { _ / "trigger" },
+    //watchSources <++= baseDirectory map { path => ((path / "app" / "views") ** "*.jade*").get},
     scalacOptions ++= Seq("-Xlint", "-deprecation"),
     javaOptions in run += "-Xmx2G -XX:MaxPermSize=512m",
     ensimeConfig := sexp(

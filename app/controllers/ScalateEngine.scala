@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.Controller
-import play.api.templates.HtmlFormat
+import play.api.templates.{ Html, HtmlFormat }
 import org.fusesource.scalate.TemplateEngine
 
 trait ScalateEngine {
@@ -13,9 +13,9 @@ trait ScalateEngine {
     e
   }
 
-  def render(template: String, attributes: Map[String, Any] = Map()) =
+  def render(template: String, attributes: Map[String, Any] = Map.empty): Html =
     HtmlFormat raw engine.layout(template, attributes)
 
-  def render(template: String, attributes: (String, Any)*) =
-    HtmlFormat raw engine.layout(template, attributes.toMap)
+  def render(template: String, attributes: (String, Any)*): Html =
+    render(template, attributes.toMap)
 }
