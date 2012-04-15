@@ -16,12 +16,14 @@
               th URL
               th Name
               th Size
+              th Time Left
           tbody
             - for (record <- records)
               tr
                 td= record.url
                 td= record.name
                 td= Helpers.readableSize(record.size)
+                td= Helpers.readableTime(record.timeLeft)
         .pagination.pagination-centered
           - if (totalPages > 1)
             = Paginator(page, totalPages, query)
