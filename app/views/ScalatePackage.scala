@@ -9,6 +9,6 @@ class ScalatePackage extends TemplatePackage {
     """
     | import controllers._
     | import models._
+    | import lib._
     """.stripMargin
 }
-
