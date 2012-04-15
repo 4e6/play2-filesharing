@@ -29,9 +29,9 @@ object Application extends Controller with ScalateEngine
 
     def failure: NonEmptyList[String] => Result = _ =>
       Ok(render("views/search.jade", menu))
+
     def success: String => Result = { q =>
-      val query = "%" + q + "%"
-      val (size, results) = getRecords(query, (p - 1) * recordsPerPage, recordsPerPage)
+      val (size, results) = getRecords(q, (p - 1) * recordsPerPage, recordsPerPage + 1)
 
       val params = menu ++ Map(
         "records" -> results,
@@ -43,14 +43,21 @@ object Application extends Controller with ScalateEngine
       Ok(render("views/search.jade", params))
     }
 
-    def getRecords(name: String, offset: Int, size: Int) = {
+    def getRecords(query: String, offset: Int, size: Int) = {
       import org.squeryl.PrimitiveTypeMode._
       transaction {
-        val query = from(Storage.records)(r =>
-          where(r.url like name)
+        val recordsEq = from(Storage.records)(r =>
+          where(r.url === query)
             select (r)
             orderBy (r.creationTime asc))
-        query.size -> query.page(offset, size).toList
+
+        val recordsLike = from(Storage.records)(r =>
+          where(r.url like ("%" + query + "%"))
+            select (r)
+            orderBy (r.creationTime asc))
+
+        val recordsAll = (recordsEq ++ recordsLike)(collection.breakOut).distinct
+        recordsAll.size -> recordsAll.slice(offset, size)
       }
     }
 
