@@ -10,6 +10,7 @@ object ApplicationBuild extends Build {
   val appVersion = "0.1"
 
   val appDependencies = Seq(
+    "postgresql" % "postgresql" % "9.1-901.jdbc4",
     "org.fusesource.scalate" % "scalate-core" % "1.5.3",
     "org.squeryl" %% "squeryl" % "0.9.5-RC1",
     "org.scalaz" %% "scalaz-core" % "6.0.4"

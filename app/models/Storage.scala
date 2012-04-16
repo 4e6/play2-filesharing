@@ -7,16 +7,14 @@ object Storage extends Schema {
 
   val root = scalax.file.Path.fromString(lib.Config.storagePath)
 
-  val records = table[Record]("RECORDS")
-  val schedule = table[Task]("SCHEDULE")
+  val records = table[Record]("records")
+  val schedule = table[Task]("schedule")
 
   on(records) { r =>
     declare(
       r.url is (unique, indexed, dbType("varchar(255)")),
       r.name is (dbType("varchar(255)")),
-      r.question is (dbType("varchar(255)")),
-      r.password is (dbType("binary(32)")),
-      r.answer is (dbType("binary(32)")))
+      r.question is (dbType("varchar(255)")))
   }
 
   on(schedule) { s =>

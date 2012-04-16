@@ -2,7 +2,7 @@ import play.api._
 import play.api.db.DB
 import org.squeryl._
 import org.squeryl.PrimitiveTypeMode._
-import org.squeryl.adapters.H2Adapter
+import org.squeryl.adapters.PostgreSqlAdapter
 import lib.Config._
 
 object Global extends GlobalSettings {
@@ -11,7 +11,7 @@ object Global extends GlobalSettings {
     implicit val a = app
 
     SessionFactory.concreteFactory = Some { () =>
-      val s = Session.create(DB.getDataSource("dev").getConnection, new H2Adapter)
+      val s = Session.create(DB.getDataSource("default").getConnection, new PostgreSqlAdapter)
       if (logStatements_?) s.setLogger(Logger.debug(_))
       s
     }
@@ -21,6 +21,8 @@ object Global extends GlobalSettings {
         models.Storage.create
       } catch {
         case e @ (_: Exception | _: RuntimeException) =>
+          Logger.warn("Failed to create models")
+          Logger.error(e.toString)
       }
     }
 
