@@ -16,14 +16,11 @@ object ApplicationBuild extends Build {
     "org.scalaz" %% "scalaz-core" % "6.0.4"
   )
 
-  val appResolvers = Seq(
-    DefaultMavenRepository,
-    "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/")
+  val appResolvers = Seq()
 
   val appSettings = Seq(
     resolvers ++= appResolvers,
-    watchSources <+= baseDirectory map { _ / "trigger" },
-    //watchSources <++= baseDirectory map { path => ((path / "app" / "views") ** "*.jade*").get},
+    watchSources <++= baseDirectory map { path => ((path / "app" / "views") ** "*.jade").get },
     scalacOptions ++= Seq("-Xlint", "-deprecation"),
     javaOptions in run += "-Xmx2G -XX:MaxPermSize=512m",
     ensimeConfig := sexp(
