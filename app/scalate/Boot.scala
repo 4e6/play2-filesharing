@@ -17,9 +17,6 @@ class Boot(engine: TemplateEngine) {
     engine.layoutStrategy = new DefaultLayoutStrategy(engine)
     ScamlOptions.format = ScamlOptions.Format.html5
 
-    Logger.debug("engine.classLoader= " + engine.classLoader)
-
-    Logger.debug("engine.isDevelopmentMode=" + engine.isDevelopmentMode)
     Logger.info("Scalate configured")
   }
 }

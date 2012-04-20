@@ -15,5 +15,5 @@ GET      /assets/*file          controllers.Assets.at(path="/public", file)
 
 # Web pages
 GET      /                      controllers.Application.index()
-GET      /search                controllers.Application.search(p:Int ?= 1)
+GET      /search                controllers.Application.search(q: String ?= "", p:Int ?= 1)
 GET      /*url                  controllers.Application.downloadIndex(url)

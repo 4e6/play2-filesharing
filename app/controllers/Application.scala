@@ -6,7 +6,6 @@ import Scalaz._
 import play.api.Logger
 import play.api.mvc._
 
-import models._
 import lib.Helpers._
 
 object Application extends Controller with ScalateEngine
@@ -20,23 +19,19 @@ object Application extends Controller with ScalateEngine
     Ok(render("views/index.jade", params))
   }
 
-  def search(p: Int) = Action { implicit request =>
-    Logger.info("search body[" + request.queryString + "]")
-
+  def search(q: String, p: Int) = Action { implicit request =>
+    import lib.Config.resultsPerPage
     val menu: Map[String, Any] = Map("menu" -> Set("Search"))
 
-    val recordsPerPage = 10
+    def failure: Result = Ok(render("views/search.jade"))
 
-    def failure: NonEmptyList[String] => Result = _ =>
-      Ok(render("views/search.jade", menu))
-
-    def success: String => Result = { q =>
-      val (size, results) = getRecords(q, (p - 1) * recordsPerPage, recordsPerPage + 1)
+    def success(q: String): Result = {
+      val (size, results) = getRecords(q, (p - 1) * resultsPerPage, resultsPerPage + 1)
 
       val params = menu ++ Map(
         "records" -> results,
         "page" -> p,
-        "totalPages" -> (size / recordsPerPage + 1),
+        "totalPages" -> (size / resultsPerPage + 1),
         "query" -> q,
         "totalResults" -> size)
 
@@ -46,12 +41,12 @@ object Application extends Controller with ScalateEngine
     def getRecords(query: String, offset: Int, size: Int) = {
       import org.squeryl.PrimitiveTypeMode._
       transaction {
-        val recordsEq = from(Storage.records)(r =>
+        val recordsEq = from(models.Storage.records)(r =>
           where(r.url === query)
             select (r)
             orderBy (r.creationTime asc))
 
-        val recordsLike = from(Storage.records)(r =>
+        val recordsLike = from(models.Storage.records)(r =>
           where(r.url like ("%" + query + "%"))
             select (r)
             orderBy (r.creationTime asc))
@@ -61,8 +56,7 @@ object Application extends Controller with ScalateEngine
       }
     }
 
-    val q = getParam("q")
-
-    q.fold(failure, success)
+    if (q.isEmpty) failure
+    else success(q)
   }
 }
