@@ -10,7 +10,7 @@ import lib.Helpers._
 
 object Scheduler {
 
-  lazy val scheduledTask = Akka.system.scheduler.schedule(1 second, 1 minute)(job)
+  lazy val scheduledTask = Akka.system.scheduler.schedule(10 seconds, 1 minute)(job)
 
   def job() {
     import org.squeryl.PrimitiveTypeMode._
@@ -21,18 +21,16 @@ object Scheduler {
     val urls = transaction {
       from(Storage.schedule)(task =>
         where(task.deletionTime lte now)
-        select(task.url)
-      )
+          select (task.url)
+      ) toList
     }
 
-    val deletedUrls = transaction {
-      urls filter { url =>
-        val dir = Storage.root / url
-        val (deleted, remains) = dir.deleteRecursively(continueOnFailure = true)
-        val msg = "Deleting " + dir + " [" + deleted + "," + remains + "]"
-        if (deleted == 2) Logger.debug(msg) else Logger.error(msg)
-        remains == 0
-      }
+    val deletedUrls = urls filter { url =>
+      val dir = Storage.root / url
+      val (deleted, remains) = dir.deleteRecursively(continueOnFailure = true)
+      val msg = "Deleting " + dir + " [" + deleted + "," + remains + "]"
+      if (deleted == 2) Logger.debug(msg) else Logger.error(msg)
+      remains == 0
     }
 
     transaction(Storage.records deleteWhere { _.url in deletedUrls })
@@ -41,12 +39,12 @@ object Scheduler {
   }
 
   def start() {
-    Logger.info("Scheduler started")
     scheduledTask
+    Logger.info("Scheduler started")
   }
 
   def stop() {
-    Logger.info("Scheduler stopped")
     scheduledTask.cancel()
+    Logger.info("Scheduler stopped")
   }
 }
