@@ -34,9 +34,18 @@ trait Download {
 
   def GetAction[A](bp: BodyParser[A] = parse.anyContent): Action[A] =
     Action(bp) { implicit request =>
-      def success(r: Record) = Ok.sendFile(
-        content = r.file,
-        fileName = _ => r.name)
+      def success(r: Record) = {
+        val content = r.file
+        SimpleResult(
+          header = ResponseHeader(OK, Map(
+            CONTENT_LENGTH -> content.length.toString,
+            CONTENT_TYPE -> play.api.libs.MimeTypes.forFileName(content.getName)
+              .getOrElse(play.api.http.ContentTypes.BINARY),
+            CONTENT_DISPOSITION -> ("""attachment; filename*=utf-8''""" + toASCIIString(r.name))
+          )),
+          play.api.libs.iteratee.Enumerator.fromFile(content)
+        )
+      }
 
       def failure(l: NonEmptyList[String]) = Ok("Fail" + l.list)
 

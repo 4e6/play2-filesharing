@@ -48,6 +48,8 @@ object Helpers {
     body.get(key).flatMap(_.headOption).toSuccess(key).liftFailNel
   }
 
+  def toASCIIString(s: String) = new java.net.URI("http", "the4e6.com", s).toASCIIString drop 16
+
   def readableTime(timeMillis: Long) = {
     val minutes = timeMillis.toMinutes - timeMillis.toHours.hours.toMinutes
     val hours = timeMillis.toHours - timeMillis.toDays.days.toHours
