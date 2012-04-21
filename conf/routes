@@ -1,5 +1,3 @@
-# Routes
-
 # Public API
 POST     /                      controllers.Application.webUpload()
 POST     /post                  controllers.Application.apiUpload()

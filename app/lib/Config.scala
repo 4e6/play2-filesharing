@@ -14,4 +14,5 @@ object Config {
   lazy val storageTime = config.getMilliseconds("storage.time") | 15.minutes.toMillis
   lazy val filesizeLimit = config.getBytes("storage.filesizeLimit") | 5.M
   lazy val resultsPerPage = config.getInt("search.resultsPerPage") | 10
+  lazy val maxInputSize = 255
 }

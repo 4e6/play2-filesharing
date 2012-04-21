@@ -35,16 +35,21 @@ class Record(val url: String,
 }
 
 object Record {
-  import scalaz.{ Logger => _, _ }
+  import scalaz._
   import Scalaz._
 
   import play.api.http.HeaderNames.CONTENT_LENGTH
   import play.api.mvc._
   import MultipartFormData.FilePart
   import play.api.libs.Files.TemporaryFile
-  import lib.Config
+  import lib._
 
   type V[X] = ValidationNEL[String, X]
+
+  trait RequestParam {
+    val name: String
+    def get[_: Request] = getParam(name) flatMap InputValidator(name)
+  }
 
   object File {
     def apply(implicit r: Request[MultipartFormData[TemporaryFile]]) =
@@ -54,60 +59,49 @@ object Record {
         "file is too large".failNel
   }
 
-  object URL {
+  object URL extends RequestParam {
+    val name = "url"
     def available(url: String) =
-      Record.get(url).toOption.cata(_ => "url reserved".failNel, url.successNel)
+      Record.get(url).toOption.cata(_ => "%s reserved".format(name).failNel, url.successNel)
 
-    def apply[T: Request](file: V[FilePart[_]]) = {
-      val url = (getParam("url"), file) match {
+    def apply[T: Request](file: V[FilePart[_]] = "file not provided".failNel) = {
+      val url: V[String] = (getParam(name), file) match {
         case (Success(u), _) => Success(u)
         case (_, Success(f)) => Success(f.filename)
-        case (_, Failure(e)) => e.fail
+        case (_, Failure(e)) => Failure(e)
       }
 
-      url flatMap available
+      url flatMap InputValidator(name) flatMap available
     }
-
-    def apply[T: Request] = getParam("url") flatMap available
-
-    def get[T: Request] = getParam("url")
   }
 
-  object Question {
-    def apply[T: Request] = getParam("question")
+  object Question extends RequestParam {
+    val name = "question"
+    def apply[T: Request] = get
   }
 
-  sealed trait Secret
+  sealed trait Secret extends RequestParam {
+    def secret(r: Record): Option[Array[Byte]]
+
+    def verify(r: Record, s: String) =
+      (secret(r) | Array.empty sameElements hash(r.creationTime.getTime)(s)) ?
+        r.successNel[String] | "incorrect %s".format(name).failNel
+
+    def apply[T: Request](time: Long) = get ∘ hash(time)
+  }
 
   case object Password extends Secret {
-    def apply[T: Request](time: Long) = getParam("password") map hash(time)
-
-    def get[T: Request] = getParam("password")
-
-    def verify(r: Record, p: String) =
-      if (r.password | Array.empty sameElements hash(r.creationTime.getTime)(p))
-        r.successNel
-      else
-        "incorrect password".failNel
+    val name = "password"
+    def secret(r: Record) = r.password
   }
 
   case object Answer extends Secret {
-    def apply[T: Request](time: Long) = getParam("answer") map hash(time)
-
-    def get[T: Request] = getParam("answer")
-
-    def verify(r: Record, a: String) =
-      if (r.answer | Array.empty sameElements hash(r.creationTime.getTime)(a))
-        r.successNel
-      else
-        "incorrect answer".failNel
+    val name = "answer"
+    def secret(r: Record) = r.answer
   }
 
   object Secret {
-    def apply(password: V[_], answer: V[_]) = (password, answer) match {
-      case (Failure(_), Success(a)) => Answer
-      case _ => Password
-    }
+    def apply(password: V[_]) = password.isFailure ? (Answer: Secret) | Password
   }
 
   private[this] def prepare(file: FilePart[TemporaryFile], url: String) = {
@@ -129,8 +123,8 @@ object Record {
             question: V[String],
             answer: V[Array[Byte]],
             from: Long) = {
-    val to = from + lib.Config.storageTime
-    Secret(password, answer) match {
+    val to = from + Config.storageTime
+    Secret(password) match {
       case Password => (file |@| url |@| password) { (f, u, p) =>
         val (name, size) = prepare(f, u)
         new Record(u, name, size, from, to, Some(p), None, None)
@@ -145,7 +139,7 @@ object Record {
   def get(url: String): V[Record] = {
     import org.squeryl.PrimitiveTypeMode._
     transaction(models.Storage.records lookup url)
-      .toSuccess("file " + url + " not found").liftFailNel
+      .toSuccess("file %s not found" format url).liftFailNel
   }
 
   def get[T: Request]: V[Record] = URL.get flatMap Record.get
@@ -153,7 +147,7 @@ object Record {
   def verify(record: V[Record],
              password: V[String],
              answer: V[String]) =
-    Secret(password, answer) match {
+    Secret(password) match {
       case Password => (record <|*|> password) flatMap { Password.verify _ tupled }
       case Answer => (record <|*|> answer) flatMap { Answer.verify _ tupled }
     }
