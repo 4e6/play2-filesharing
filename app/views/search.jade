@@ -1,4 +1,5 @@
 -@ val records: Seq[Record] = Seq.empty
+-@ val displayedUrl: String = ""
 -@ val totalResults: Int = 0
 -@ val query: String = ""
 -@ val page: Int = 1
@@ -15,8 +16,8 @@
             tr
               th URL
               th Name
-              th Size
-              th Time Left
+              th(style="width: 80px;") Size
+              th(style="width: 80px;") Remain
           tbody
             - for (record <- records)
               tr
