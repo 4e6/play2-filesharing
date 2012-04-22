@@ -11,7 +11,7 @@
     .span2 &nbsp
     .span8
       - if (records.nonEmpty)
-        table.table.table-striped
+        table.table.table-striped.break-words
           thead
             tr
               th URL
@@ -31,13 +31,11 @@
     .span2 &nbsp
 
 - layout("layouts/main.jade")
-  .page-header
-    h1 Search
   form#search(action={routes.Application.search()} method="get")
     input#search(type="text" name="q" placeholder="What are you looking for?")
   .summary
     - if (query.nonEmpty)
       - if (records.isEmpty && totalResults == 0)
-        p Nothing found for [#{query}]
+        p.break-words Nothing found for [#{query}]
       - else
-        p Found #{totalResults} records for [#{query}]
+        p.break-words Found #{totalResults} records for [#{query}]
