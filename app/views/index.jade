@@ -14,7 +14,7 @@
         input#file.input-file(type="file" name="file")
         span#file-hint.help-inline
       .control-group
-        span http://localhost/
+        span #{Config.appUrl}/
         input#url(type="text" name="url" placeholder="Annual report.docx")
         span#loader(style="display: none;")
           img(src={routes.Assets.at("images/ajax-loader.gif")})

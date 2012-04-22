@@ -12,5 +12,5 @@
     .links-well
       pre
         code
-          | http://localhost:9000/#{url}
-          | curl -F url=#{url} -F password=YourPWD http://localhost:9000/get
+          | #{Config.appUrl}/#{url}
+          | curl -F url=#{url} -F password=YourPass #{Config.appUrl}/get
