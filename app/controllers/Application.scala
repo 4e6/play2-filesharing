@@ -40,19 +40,33 @@ object Application extends Controller with ScalateEngine
 
     def getRecords(query: String, offset: Int, size: Int) = {
       import org.squeryl.PrimitiveTypeMode._
+
+      def %(query: String) = "%" + query + "%"
+      val queryParts = query.split(" ").map(%)(collection.breakOut).distinct
+
       transaction {
         val recordsEq = from(models.Storage.records)(r =>
-          where(r.url === query)
+          where(r.url === query or r.name === query)
             select (r)
-            orderBy (r.creationTime asc))
+            orderBy (r.creationTime asc)
+        ).distinct
 
         val recordsLike = from(models.Storage.records)(r =>
-          where(r.url like ("%" + query + "%"))
+          where((r.url like %(query)) or (r.name like %(query)))
             select (r)
-            orderBy (r.creationTime asc))
+            orderBy (r.creationTime asc)
+        ).distinct
 
-        val recordsAll = (recordsEq ++ recordsLike)(collection.breakOut).distinct
-        recordsAll.size -> recordsAll.slice(offset, size)
+        val recordsResemble = queryParts map { part =>
+          from(models.Storage.records)(r =>
+            where((r.url like part) or (r.name like part))
+              select (r)
+          )
+        }
+
+        val results = (recordsEq ++ recordsLike ++ recordsResemble.flatten)(collection.breakOut).distinct
+
+        results.size -> results.slice(offset, size)
       }
     }
 
