@@ -110,7 +110,7 @@ object Record {
     val dest = Storage.root / url / name
 
     /* Workaround for scala-io 'moveTo bug
-       * https://github.com/jesseeichar/scala-io/issues/54*/
+     * https://github.com/jesseeichar/scala-io/issues/54*/
     scalax.file.Path(ref.file) copyTo dest
     ref.clean
 
