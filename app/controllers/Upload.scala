@@ -57,7 +57,8 @@ trait Upload {
     def success(r: Record) = Ok {
       val params = Map(
         "url" -> r.url,
-        "time" -> readableTime(r.timeLeft))
+        "time" -> readableTime(r.timeLeft),
+        "withPassword" -> r.password.isDefined)
       render("views/uploadSuccess.jade", params)
     }
 

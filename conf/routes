@@ -2,7 +2,7 @@
 POST     /                      controllers.Application.webUpload()
 POST     /post                  controllers.Application.apiUpload()
 POST     /get                   controllers.Application.apiGetMultipart()
-GET      /get                   controllers.Application.apiGet()
+GET      /get/*file             controllers.Application.apiGet(file)
 
 # Private API
 POST     /checkUrl              controllers.Application.checkUrl()

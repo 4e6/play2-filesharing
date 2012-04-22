@@ -41,7 +41,7 @@ trait Download {
             CONTENT_LENGTH -> content.length.toString,
             CONTENT_TYPE -> play.api.libs.MimeTypes.forFileName(content.getName)
               .getOrElse(play.api.http.ContentTypes.BINARY),
-            CONTENT_DISPOSITION -> ("""attachment; filename*=utf-8''""" + toASCIIString(r.name))
+            CONTENT_DISPOSITION -> "attachment;"
           )),
           play.api.libs.iteratee.Enumerator.fromFile(content)
         )
@@ -60,7 +60,7 @@ trait Download {
 
   def apiGetMultipart = GetAction(parse.multipartFormData)
 
-  def apiGet = GetAction()
+  def apiGet(file: String) = GetAction()
 
   /** Check password or answer*/
   def checkSecret = Action(parse.urlFormEncoded) { implicit request =>
