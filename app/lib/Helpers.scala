@@ -55,8 +55,8 @@ object Helpers {
     val hours = timeMillis.toHours - timeMillis.toDays.days.toHours
     val days = timeMillis.toDays
 
-    if (days == 0) "%02d:%02d".format(hours, minutes)
-    else "%dd %02d:%02d".format(days, hours, minutes)
+    if (days == 0) "%2dh %2dm".format(hours, minutes)
+    else "%dd %2dh %2dm".format(days, hours, minutes)
   }
 
   def readableSize(size: Long) = {
