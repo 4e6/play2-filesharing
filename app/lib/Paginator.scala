@@ -4,7 +4,7 @@ import scalaz._
 import Scalaz._
 
 class Paginator(width: Int = 3,
-                url: String = "http://localhost:9000/search",
+                url: String = "%s/search".format(Config.appUrl),
                 delimiter: String = "...") {
   private case class Page(val num: String,
                           val aHref: Option[String] = None,

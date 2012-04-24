@@ -1,6 +1,6 @@
 package controllers
 
-import scalaz.{ Logger => _, _ }
+import scalaz._
 import Scalaz._
 
 import play.api.Logger

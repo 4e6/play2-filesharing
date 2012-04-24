@@ -1,6 +1,6 @@
 package controllers
 
-import scalaz.{ Logger => _, _ }
+import scalaz._
 import Scalaz._
 
 import play.api._
@@ -48,8 +48,6 @@ trait Download {
       }
 
       def failure(l: NonEmptyList[String]) = Ok("Fail" + l.list)
-
-      Logger.debug("apiGet body[" + request.body + "]")
 
       val record = Record.get
       val pass = Record.Password.get

@@ -1,6 +1,6 @@
 package controllers
 
-import scalaz.{ Logger => _, _ }
+import scalaz._
 import Scalaz._
 
 import play.api._
@@ -18,7 +18,6 @@ trait Upload {
 
   def Upload(onFailure: StringNEL => Result, onSuccess: Record => Result) =
     Action(parse.multipartFormData) { implicit request =>
-      Logger.debug("Upload body[" + request.body + "]")
 
       def success(record: Record) = {
         import org.squeryl.PrimitiveTypeMode._
@@ -73,8 +72,6 @@ trait Upload {
     def failure(l: NonEmptyList[String]) = l.list mkString ", "
 
     def success(f: String) = "available"
-
-    Logger.debug("checkUrl request body[" + request.body + "]")
 
     val url = Record.URL()
 

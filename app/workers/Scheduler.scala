@@ -14,7 +14,6 @@ object Scheduler {
 
   def job() {
     import org.squeryl.PrimitiveTypeMode._
-    Logger.info("Running scheduled job")
 
     val now: java.sql.Timestamp = timeNow
 
