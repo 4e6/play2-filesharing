@@ -1,0 +1,18 @@
+- attributes("title") = "About"
+
+- layout("layouts/main.jade")
+  .page-header
+    h1 About
+  .description
+    | Welcome to WebClipboard filesharing service.
+    | API is available:
+    h4 Upload:
+    p
+      code $ curl -F url='desired url' -F password='your password' #{Config.appUrl}/post
+    p
+      code $ curl -F url='desired url' -F question='qusetion' -F answer=<answer> #{Config.appUrl}/post
+    h4 Download:
+    p
+      code $ curl -F url='your url' -F password='password' #{Config.appUrl}/get
+    p
+      code $ curl -F url='your url' -F answer='answer' #{Config.appUrl}/get

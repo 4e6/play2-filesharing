@@ -60,7 +60,7 @@ trait Download {
 
   def apiGet(file: String) = GetAction()
 
-  /** Check password or answer*/
+  /** Check password or answer */
   def checkSecret = Action(parse.urlFormEncoded) { implicit request =>
     import play.api.libs.json._
     import Json._

@@ -41,4 +41,9 @@ object Application extends Controller with ScalateEngine
 
     (q.isEmpty) ? failure | success(q)
   }
+
+  def about = Action {
+    Ok(render("views/about.jade", "menu" -> Set("About")))
+  }
+
 }
